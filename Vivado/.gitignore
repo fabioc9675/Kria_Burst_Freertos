@@ -21,7 +21,7 @@
 !IP/*/*
 !IP/*/*.xci*
 
-Products/
+!Products/
 
 BD/*
 !bd/*.bd
