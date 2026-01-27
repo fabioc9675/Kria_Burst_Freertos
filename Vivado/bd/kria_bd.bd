@@ -30,7 +30,8 @@
       "axi_dma": "",
       "axi_smc": "",
       "c_counter_binary_0": "",
-      "util_vector_logic_0": ""
+      "util_vector_logic_0": "",
+      "xlconcat_0": ""
     },
     "interface_ports": {
       "uf_leds": {
@@ -2277,6 +2278,20 @@
             "value": "1"
           }
         }
+      },
+      "xlconcat_0": {
+        "vlnv": "xilinx.com:ip:xlconcat:2.1",
+        "xci_name": "kria_bd_xlconcat_0_0",
+        "xci_path": "ip\\kria_bd_xlconcat_0_0\\kria_bd_xlconcat_0_0.xci",
+        "inst_hier_path": "xlconcat_0",
+        "parameters": {
+          "IN0_WIDTH": {
+            "value": "1"
+          },
+          "IN1_WIDTH": {
+            "value": "6"
+          }
+        }
       }
     },
     "interface_nets": {
@@ -2324,6 +2339,12 @@
       }
     },
     "nets": {
+      "axi_dma_s2mm_introut": {
+        "ports": [
+          "axi_dma/s2mm_introut",
+          "xlconcat_0/In0"
+        ]
+      },
       "c_counter_binary_0_THRESH0": {
         "ports": [
           "c_counter_binary_0/THRESH0",
@@ -2366,7 +2387,7 @@
       "pulse_irq_0_irq_out": {
         "ports": [
           "pulse_irq_0/irq_out",
-          "zynq_ultra_ps_e_0/pl_ps_irq0"
+          "xlconcat_0/In1"
         ]
       },
       "pulse_irq_0_led_out": {
@@ -2379,6 +2400,12 @@
         "ports": [
           "util_vector_logic_0/Res",
           "c_counter_binary_0/SCLR"
+        ]
+      },
+      "xlconcat_0_dout": {
+        "ports": [
+          "xlconcat_0/dout",
+          "zynq_ultra_ps_e_0/pl_ps_irq0"
         ]
       },
       "xlconstant_0_dout": {
