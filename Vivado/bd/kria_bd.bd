@@ -5,7 +5,7 @@
       "device": "xck26-sfvc784-2LV-c",
       "gen_directory": "kria_bd",
       "name": "kria_bd",
-      "pfm_name": "xilinx:kr260_som:Kria_irq_bd:1.9",
+      "pfm_name": "xilinx:kr260_som:Kria_bd:1.0",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "None",
       "tool_version": "2022.2",
@@ -1452,13 +1452,13 @@
             "value": "IOPLL"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__ACT_FREQMHZ": {
-            "value": "100.000000"
+            "value": "99.999992"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__FREQMHZ": {
             "value": "100"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__SRCSEL": {
-            "value": "DPLL"
+            "value": "IOPLL"
           },
           "PSU__CRL_APB__PL1_REF_CTRL__ACT_FREQMHZ": {
             "value": "4.784688"
@@ -2046,7 +2046,7 @@
             "direction": "I",
             "parameters": {
               "FREQ_HZ": {
-                "value": "100000000",
+                "value": "99999992",
                 "value_src": "user_prop"
               },
               "CLK_DOMAIN": {
