@@ -36,8 +36,8 @@ RemoteSystemsTempFiles/
 *_stub.vhdl
 *_funcsim.v
 *_funcsim.vhdl
-.project
-.cproject
+!*.project
+!*.cproject
 .system
 .mss
 .spec
