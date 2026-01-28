@@ -5,6 +5,10 @@
       <applications name="dma_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
       <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
     </configBuildOptions>
+    <lastBuildOptions xsi:type="systemproject:SystemOptions">
+      <applications name="dma_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
+      <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
+    </lastBuildOptions>
   </configuration>
   <configuration name="Emulation-HW" id="com.xilinx.sdx.system.managedbuilder.hwemu.configuration.1755395837">
     <configBuildOptions xsi:type="systemproject:SystemOptions" target="hw_emu">
@@ -17,5 +21,9 @@
       <applications name="dma_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
       <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
     </configBuildOptions>
+    <lastBuildOptions xsi:type="systemproject:SystemOptions" target="hw">
+      <applications name="dma_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
+      <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
+    </lastBuildOptions>
   </configuration>
 </systemproject:SystemProject>
