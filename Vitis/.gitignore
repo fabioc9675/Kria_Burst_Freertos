@@ -48,7 +48,7 @@ RemoteSystemsTempFiles/
 *.mcs
 *.prm
 *.xml
-*.prj
+!*.prj
 *.srcs
 *.runs
 *.cache
