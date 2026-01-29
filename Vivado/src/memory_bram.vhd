@@ -30,8 +30,9 @@ if reset = '0' then
    contador <= 0;
    address_int <= (others => '0');
 elsif rising_edge(clk) then
-   address_int <= address_int + 1;
-   contador <= contador + 1;
+            
+   contador <= (contador + 1) mod 48000;
+   address_int <= std_logic_vector(to_unsigned(contador, 16));
    dout <= std_logic_vector(to_unsigned(contador, 32));
 end if;
 end process;   

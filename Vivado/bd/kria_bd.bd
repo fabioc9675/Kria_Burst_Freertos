@@ -5,7 +5,7 @@
       "device": "xck26-sfvc784-2LV-c",
       "gen_directory": "kria_bd",
       "name": "kria_bd",
-      "pfm_name": "xilinx:kr260_som:Kria_bd:1.2",
+      "pfm_name": "xilinx:kr260_som:kria_bd:1.3",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "None",
       "tool_version": "2022.2",
@@ -1447,13 +1447,13 @@
             "value": "IOPLL"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__ACT_FREQMHZ": {
-            "value": "100.000000"
+            "value": "99.999992"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__FREQMHZ": {
             "value": "100"
           },
           "PSU__CRL_APB__PL0_REF_CTRL__SRCSEL": {
-            "value": "DPLL"
+            "value": "IOPLL"
           },
           "PSU__CRL_APB__PL1_REF_CTRL__ACT_FREQMHZ": {
             "value": "4.784688"
@@ -2033,7 +2033,7 @@
             "direction": "I",
             "parameters": {
               "FREQ_HZ": {
-                "value": "100000000",
+                "value": "99999992",
                 "value_src": "user_prop"
               },
               "CLK_DOMAIN": {
@@ -2126,21 +2126,45 @@
       },
       "bram_input_0": {
         "vlnv": "xilinx.com:ip:blk_mem_gen:8.4",
-        "xci_name": "kria_bd_blk_mem_gen_0_0",
-        "xci_path": "ip\\kria_bd_blk_mem_gen_0_0\\kria_bd_blk_mem_gen_0_0.xci",
+        "xci_name": "kria_bd_bram_input_0_0",
+        "xci_path": "ip\\kria_bd_bram_input_0_0\\kria_bd_bram_input_0_0.xci",
         "inst_hier_path": "bram_input_0",
         "parameters": {
           "Assume_Synchronous_Clk": {
             "value": "true"
           },
+          "Byte_Size": {
+            "value": "8"
+          },
+          "Collision_Warnings": {
+            "value": "ALL"
+          },
+          "Disable_Collision_Warnings": {
+            "value": "false"
+          },
+          "Enable_32bit_Address": {
+            "value": "false"
+          },
+          "Enable_A": {
+            "value": "Use_ENA_Pin"
+          },
+          "Enable_B": {
+            "value": "Use_ENB_Pin"
+          },
           "Memory_Type": {
             "value": "True_Dual_Port_RAM"
           },
+          "Register_PortA_Output_of_Memory_Primitives": {
+            "value": "true"
+          },
+          "Register_PortB_Output_of_Memory_Primitives": {
+            "value": "true"
+          },
           "Use_Byte_Write_Enable": {
-            "value": "false"
+            "value": "true"
           },
           "Write_Depth_A": {
-            "value": "65536"
+            "value": "62536"
           },
           "Write_Width_A": {
             "value": "32"
@@ -2152,8 +2176,8 @@
       },
       "axi_bram_ctrl_0": {
         "vlnv": "xilinx.com:ip:axi_bram_ctrl:4.1",
-        "xci_name": "kria_bd_axi_bram_ctrl_0_1",
-        "xci_path": "ip\\kria_bd_axi_bram_ctrl_0_1\\kria_bd_axi_bram_ctrl_0_1.xci",
+        "xci_name": "kria_bd_axi_bram_ctrl_0_0",
+        "xci_path": "ip\\kria_bd_axi_bram_ctrl_0_0\\kria_bd_axi_bram_ctrl_0_0.xci",
         "inst_hier_path": "axi_bram_ctrl_0",
         "parameters": {
           "SINGLE_PORT_BRAM": {
@@ -2181,7 +2205,7 @@
                 "value_src": "constant"
               },
               "FREQ_HZ": {
-                "value": "100000000",
+                "value": "99999992",
                 "value_src": "user_prop"
               },
               "CLK_DOMAIN": {
@@ -2295,8 +2319,8 @@
           "dds_compiler_0/aclk",
           "axi_bram_ctrl_0/s_axi_aclk",
           "ps8_0_axi_periph/M01_ACLK",
-          "memory_bram_0/clk",
-          "bram_input_0/clkb"
+          "bram_input_0/clkb",
+          "memory_bram_0/clk"
         ]
       },
       "memory_bram_0_address": {

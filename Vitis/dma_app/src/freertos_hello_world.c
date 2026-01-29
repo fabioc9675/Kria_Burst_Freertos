@@ -16,7 +16,19 @@
 // Buffer alineado para optimizar el uso de NEON con memcpy
 s16 local_data[SAMPLES] __attribute__ ((aligned (64)));
 
-// --- Función de Inicialización ---
+
+// --- HELPERS TIEMPO ARM A53 ---
+static inline uint64_t get_hw_time(void) {
+	uint64_t val;
+	asm volatile("mrs %0, cntpct_el0" : "=r" (val));
+	return val;
+}
+
+static inline uint32_t get_hw_freq(void) {
+	uint32_t val;
+	asm volatile("mrs %0, cntfrq_el0" : "=r" (val));
+	return val;
+}
 
 
 // --- Tarea de Impresión Serial ---
@@ -24,11 +36,13 @@ void vSerialPrintTask(void *pvParameters) {
     TickType_t xLastWakeTime;
     const TickType_t xFrequency = pdMS_TO_TICKS(10000); // 10 segundos
 
+    uint64_t freq = get_hw_freq();
+
     xLastWakeTime = xTaskGetTickCount();
     xil_printf("Iniciando captura y lectura por memcpy...\r\n");
 
     // Prueba de escritura directa (bypass total de drivers)
-    Xil_Out32(0x82000000, 0x1234);
+    Xil_Out32(0x82000000, 12345);
     uint32_t val = Xil_In32(0x82000000);
 
     if (val == 0x12345678) {
@@ -40,13 +54,20 @@ void vSerialPrintTask(void *pvParameters) {
     while (1) {
 
         // 3. Copia masiva BRAM -> RAM (Muy rápido con memcpy)
-        memcpy(local_data, (void*)BRAM_IDA_ADDR, SAMPLES * sizeof(s16));
+    	uint64_t t_i_start = get_hw_time();
+    	memcpy(local_data, (void*)BRAM_IDA_ADDR, SAMPLES * sizeof(s16));
+        uint64_t t_i_end = get_hw_time() - t_i_start;
+
+        float time = (float)(t_i_end * 1000000.0 / freq);
 
         // 4. Impresión Serial (Operación lenta, por eso usamos memcpy antes)
         xil_printf("--- Datos del DDS (Primeros 1000) ---\r\n");
         for (int i = 0; i < PRINT_SAMPLES; i++) {
-            xil_printf("%d, ", (int)local_data[i]);
+            xil_printf("%d, ", (long)local_data[i]);
         }
+
+        xil_printf("\r\nread time = %d.%d (us), ticks = %lu \r\n", (int) time,
+				(int) ((time - (int) time) * 100), t_i_end);
 
 //        uint32_t *mem_ptr = (uint32_t*)BRAM_IDA_ADDR;
 //        for(int i=0; i < 1000; i++) {
