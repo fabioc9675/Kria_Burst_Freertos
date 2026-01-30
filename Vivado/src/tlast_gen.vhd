@@ -26,28 +26,41 @@ end axis_packet_controller;
 architecture Behavioral of axis_packet_controller is
     signal sample_count : integer range 0 to MAX_SAMPLES := 0;
     signal can_transfer : STD_LOGIC;
+    -- Nueva señal para controlar cuándo empezar un paquete
+    signal is_sending   : STD_LOGIC := '0'; 
 begin
 
-    can_transfer <= s_axis_tvalid and m_axis_tready;
+    -- El apretón de manos solo es válido si estamos en medio de un paquete activo
+    can_transfer <= s_axis_tvalid and m_axis_tready and is_sending;
 
-    -- Pasamos los datos directamente con zero-padding
     m_axis_tdata  <= X"0000" & s_axis_tdata;
-    m_axis_tvalid <= s_axis_tvalid;
-    s_axis_tready <= m_axis_tready;
+    m_axis_tvalid <= s_axis_tvalid and is_sending;
+    
+    -- Solo aceptamos datos de la entrada si el DMA está listo y queremos enviar
+    s_axis_tready <= m_axis_tready and is_sending;
 
-    -- TLAST debe estar presente EXACTAMENTE cuando se transfiere la última muestra
-    -- Lo hacemos combinacional para que no tenga latencia respecto al contador
-    m_axis_tlast <= '1' when (sample_count = MAX_SAMPLES - 1) else '0';
+    -- TLAST sincronizado
+    m_axis_tlast <= '1' when (sample_count = MAX_SAMPLES - 1 and can_transfer = '1') else '0';
 
     process(clk)
     begin
         if rising_edge(clk) then
             if resetn = '0' then
                 sample_count <= 0;
+                is_sending <= '0';
             else
-                if can_transfer = '1' then
+                -- LÓGICA DE CONTROL:
+                -- Si el DMA está listo (tready='1') y no estamos enviando, 
+                -- significa que el PS acaba de pedir un paquete nuevo.
+                if is_sending = '0' and m_axis_tready = '1' then
+                    is_sending   <= '1';
+                    sample_count <= 0; -- Empezamos SIEMPRE desde la muestra 0
+                
+                -- Si estamos enviando y ocurre un handshake
+                elsif can_transfer = '1' then
                     if sample_count = (MAX_SAMPLES - 1) then
-                        sample_count <= 0; -- Reinicio tras la última muestra
+                        sample_count <= 0;
+                        is_sending   <= '0'; -- Cerramos el paquete y esperamos al próximo tready
                     else
                         sample_count <= sample_count + 1;
                     end if;
@@ -55,5 +68,4 @@ begin
             end if;
         end if;
     end process;
-
 end Behavioral;

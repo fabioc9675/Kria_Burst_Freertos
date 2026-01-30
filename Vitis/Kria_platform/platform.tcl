@@ -29,3 +29,5 @@ platform config -updatehw {C:/GitHub/KRIA_Burst_Freertos/Vivado/Products/kria_bd
 platform generate -domains 
 platform clean
 platform generate
+platform config -updatehw {C:/GitHub/KRIA_Burst_Freertos/Vivado/Products/kria_bd_wrapper.xsa}
+platform generate -domains 

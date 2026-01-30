@@ -18,7 +18,7 @@
 
 int vect_s[7] = { 1024, 2048, 4096, 8192, 16384, 32768, 48000 };
 
-u16 RxBuffer[SAMPLES] __attribute__((aligned(64)));
+u32 RxBuffer[SAMPLES] __attribute__((aligned(64))); // Cambiar a u32
 XAxiDma AxiDmaOut;                         // Instance of the DMA engine
 XAxiDma AxiDmaIn;                          // Instance of the DMA engine
 XScuGic InterruptController;            // Instance of the Interrupt Controller
@@ -59,6 +59,7 @@ int main(void) {
 
 void dma_transfer_task(void *pvParameters) {
 	int Status;
+	int cont = 0;
 	uint64_t freq = get_hw_freq();
 
 	Status = init_dma_out();
@@ -75,11 +76,12 @@ void dma_transfer_task(void *pvParameters) {
 
 	// FIJAMOS EL TAMAÑO: 48000 muestras de 16 bits = 96000 bytes
 	const int FIXED_SAMPLES = 48000;
-	const int BYTES_TO_TRANSFER = FIXED_SAMPLES * sizeof(u16);
+	const int BYTES_TO_TRANSFER = FIXED_SAMPLES; //* sizeof(u16);
 
 	xil_printf("Iniciando test de tamano fijo: %d bytes\r\n", SAMPLES);
 
 	while (1) { // Bucle infinito para probar la estabilidad
+
 
 		// 1. Limpiar caché: Aseguramos que la RAM esté lista para recibir
 		Xil_DCacheFlushRange((UINTPTR) RxBuffer, BYTES_TO_TRANSFER);
@@ -119,10 +121,18 @@ void dma_transfer_task(void *pvParameters) {
 //        }
 
 		// 1. Limpiar todo el buffer
+		// Limpiamos el buffer
 		memset(RxBuffer, 0, BYTES_TO_TRANSFER);
 
-		for (int i = 0; i < SAMPLES; i++) {
-			RxBuffer[i] = 123;
+		// El monitor espera el valor 123 en el ciclo 100 del bus.
+		// Como el bus es de 32 bits y el buffer de 16:
+		// Ciclo 100 del bus = Muestra 201 (parte alta) y Muestra 200 (parte baja).
+		if (cont % 3 == 0) {
+			RxBuffer[100] = 112; // Ahora sí, posición 100 es ciclo 100
+		} else if (cont % 3 == 1) {
+			RxBuffer[100] = 123; // Ahora sí, posición 100 es ciclo 100
+		} else {
+			RxBuffer[100] = 0; // Ahora sí, posición 100 es ciclo 100
 		}
 
 		// ¡ESTO ES LO QUE FALTA!
@@ -160,6 +170,8 @@ void dma_transfer_task(void *pvParameters) {
 				"Transferencia OK. Tiempo Entrada: %d us, \tTiempo Salida: %d us\r\n",
 				(int) time, (int) time_in);
 
+		cont++;
+
 		vTaskDelay(pdMS_TO_TICKS(1000)); // Esperar 1 seg entre pruebas
 	}
 }
@@ -179,6 +191,11 @@ int init_dma_out() {
 		xil_printf("Initialization failed %d\r\n", Status);
 		return XST_FAILURE;
 	}
+
+	// Leemos el registro de estado específico de S2MM (Entrada)
+	// Usamos el offset 0x34 directamente para no fallar
+	u32 s2mm_status = XAxiDma_ReadReg(CfgPtr->BaseAddr, 0x34);
+	xil_printf("S2MM Status Register (Entrada): 0x%08X\r\n", s2mm_status);
 
 	if (AxiDmaOut.HasS2Mm) {
 		xil_printf("Canal S2MM detectado y listo.\r\n");
