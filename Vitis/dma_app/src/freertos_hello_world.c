@@ -76,7 +76,8 @@ void dma_transfer_task(void *pvParameters) {
 
 	// FIJAMOS EL TAMAÑO: 48000 muestras de 16 bits = 96000 bytes
 	const int FIXED_SAMPLES = 48000;
-	const int BYTES_TO_TRANSFER = FIXED_SAMPLES; //* sizeof(u16);
+	const int BYTES_TO_TRANSFER = FIXED_SAMPLES * 4;
+	//const int BYTES_TO_TRANSFER = FIXED_SAMPLES; //* sizeof(u16);
 
 	xil_printf("Iniciando test de tamano fijo: %d bytes\r\n", SAMPLES);
 
@@ -87,6 +88,9 @@ void dma_transfer_task(void *pvParameters) {
 		Xil_DCacheFlushRange((UINTPTR) RxBuffer, BYTES_TO_TRANSFER);
 
 		uint64_t t_i_start = get_hw_time();
+
+//		XAxiDma_Reset(&AxiDmaOut);
+//		while(!XAxiDma_ResetIsDone(&AxiDmaOut));
 
 		// 2. Iniciar transferencia
 		Status = XAxiDma_SimpleTransfer(&AxiDmaOut, (UINTPTR) RxBuffer,
@@ -105,7 +109,7 @@ void dma_transfer_task(void *pvParameters) {
 			timeout++;
 			if (timeout > 10000000) { // Timeout arbitrario
 				xil_printf(
-						"TIMEOUT: El DMA sigue ocupado. ¿La PL envió TLAST?\r\n");
+						"TIMEOUT: El DMA sigue ocupado. La PL envio TLAST?\r\n");
 				break;
 			}
 		}
@@ -155,7 +159,7 @@ void dma_transfer_task(void *pvParameters) {
 			timeout++;
 			if (timeout > 10000000) { // Timeout arbitrario
 				xil_printf(
-						"TIMEOUT: El DMA sigue ocupado. ¿La PL envió TLAST?\r\n");
+						"TIMEOUT: El DMA sigue ocupado. La PL envio TLAST?\r\n");
 				break;
 			}
 		}
@@ -167,7 +171,7 @@ void dma_transfer_task(void *pvParameters) {
 		float time_in = (float) (t_i_end * 1000000.0 / freq);
 
 		xil_printf(
-				"Transferencia OK. Tiempo Entrada: %d us, \tTiempo Salida: %d us\r\n",
+				"Transfer OK. Read time (PL2PS): %d us, \tWrite time (PS2PL): %d us\r\n",
 				(int) time, (int) time_in);
 
 		cont++;
