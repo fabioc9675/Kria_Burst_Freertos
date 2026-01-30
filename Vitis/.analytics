@@ -13,3 +13,39 @@ timestamp=[2026-01-26 23:48:17], mode=WORKBENCH_UI_INIT, duration=0:00:00.740, d
 timestamp=[2026-01-26 23:48:19], mode=PLATFORM_REPOSITORY_INIT, duration=0:00:00.444, duration_ms=444, data={}
 timestamp=[2026-01-26 23:52:45], mode=BUILD, duration=0:00:00.807, duration_ms=807, data={name=dma_app, configuration=Debug, clean_build=false}
 timestamp=[2026-01-27 00:05:35], mode=BUILD, duration=0:00:00.988, duration_ms=988, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 21:55:13], mode=WORKBENCH_START, duration=0:00:11.395, duration_ms=11395, data={}
+timestamp=[2026-01-29 21:55:14], mode=WORKBENCH_UI_INIT, duration=0:00:00.862, duration_ms=862, data={editors_count=3, platform_editors_count=1, projects_count=4, platform_projects_count=1, active_platform_editor=false, projects=Kria_platform,RemoteSystemsTempFiles,dma_app,dma_app_system}
+timestamp=[2026-01-29 21:55:16], mode=PLATFORM_REPOSITORY_INIT, duration=0:00:00.636, duration_ms=636, data={}
+timestamp=[2026-01-29 22:16:51], mode=PLATFORM_GENERATION, duration=0:00:14.793, duration_ms=14793, data={name=Kria_platform}
+timestamp=[2026-01-29 22:17:01], mode=BUILD, duration=0:00:01.546, duration_ms=1546, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 22:21:24], mode=BUILD, duration=0:00:00.116, duration_ms=116, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 22:22:30], mode=PLATFORM_GENERATION, duration=0:00:11.101, duration_ms=11101, data={name=Kria_platform}
+timestamp=[2026-01-29 22:23:34], mode=PLATFORM_GENERATION, duration=0:01:01.280, duration_ms=61280, data={name=Kria_platform}
+timestamp=[2026-01-29 22:27:39], mode=BUILD, duration=0:00:00.118, duration_ms=118, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 22:32:06], mode=BUILD, duration=0:00:00.930, duration_ms=930, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 22:37:57], mode=BUILD, duration=0:00:00.607, duration_ms=607, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 22:50:14], mode=PLATFORM_GENERATION, duration=0:00:11.249, duration_ms=11249, data={name=Kria_platform}
+timestamp=[2026-01-29 22:50:57], mode=BUILD, duration=0:00:00.796, duration_ms=796, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 22:51:20], mode=BUILD, duration=0:00:00.116, duration_ms=116, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 22:53:33], mode=BUILD, duration=0:00:00.737, duration_ms=737, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 22:57:19], mode=BUILD, duration=0:00:00.873, duration_ms=873, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:02:50], mode=BUILD, duration=0:00:00.794, duration_ms=794, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:02:58], mode=BUILD, duration=0:00:00.860, duration_ms=860, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:08:52], mode=BUILD, duration=0:00:00.295, duration_ms=295, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:09:13], mode=BUILD, duration=0:00:00.789, duration_ms=789, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:11:32], mode=BUILD, duration=0:00:00.247, duration_ms=247, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:11:57], mode=BUILD, duration=0:00:00.295, duration_ms=295, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:13:04], mode=BUILD, duration=0:00:00.299, duration_ms=299, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:13:18], mode=BUILD, duration=0:00:00.976, duration_ms=976, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:18:05], mode=BUILD, duration=0:00:00.974, duration_ms=974, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:19:16], mode=BUILD, duration=0:00:00.793, duration_ms=793, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:23:59], mode=BUILD, duration=0:00:00.235, duration_ms=235, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:24:16], mode=BUILD, duration=0:00:00.297, duration_ms=297, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:24:23], mode=BUILD, duration=0:00:00.778, duration_ms=778, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:24:28], mode=BUILD, duration=0:00:00.783, duration_ms=783, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:25:52], mode=BUILD, duration=0:00:00.789, duration_ms=789, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-29 23:29:24], mode=BUILD, duration=0:00:00.788, duration_ms=788, data={name=dma_app, configuration=Debug, clean_build=false}
+timestamp=[2026-01-30 00:23:42], mode=PLATFORM_GENERATION, duration=0:00:11.643, duration_ms=11643, data={name=Kria_platform}
+timestamp=[2026-01-30 00:24:05], mode=PLATFORM_GENERATION, duration=0:00:08.154, duration_ms=8154, data={name=Kria_platform}
+timestamp=[2026-01-30 00:25:34], mode=PLATFORM_GENERATION, duration=0:00:56.301, duration_ms=56301, data={name=Kria_platform}
+timestamp=[2026-01-30 00:26:07], mode=BUILD, duration=0:00:00.908, duration_ms=908, data={name=dma_app, configuration=Debug, clean_build=false}
