@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ASCII"?>
-<sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="Core_0_receiver_app" location="C:/GitHub/KRIA_Burst_Freertos/Vitis/Core_0_receiver_app" platform="C:/GitHub/KRIA_Burst_Freertos/Vitis/Kria_platform/export/Kria_platform/Kria_platform.xpfm" platformUID="xilinx:kr260_som:kria_bd:1.4(custom)" systemProject="Core_0_receiver_app_system" sysConfig="Kria_platform" runtime="C/C++" cpu="freertos10_xilinx_domain" cpuInstance="psu_cortexa53_0" os="freertos10_xilinx" mssSignature="95fb597a759eeba0524391bade862dfa">
-  <configuration name="Debug" id="xilinx.gnu.arm.a53.exe.debug.1220756426" dirty="true">
+<sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="Core_0_receiver_app" location="C:/GitHub/KRIA_Burst_Freertos/Vitis/Core_0_receiver_app" platform="C:/GitHub/KRIA_Burst_Freertos/Vitis/Kria_platform/export/Kria_platform/Kria_platform.xpfm" platformUID="xilinx:kr260_som:kria_bd:1.4(custom)" systemProject="Core_0_receiver_app_system" sysConfig="Kria_platform" runtime="C/C++" cpu="freertos10_xilinx_domain" cpuInstance="psu_cortexa53_0" os="freertos10_xilinx" mssSignature="910a6dada844b070cfb430941b9229af">
+  <configuration name="Debug" id="xilinx.gnu.arm.a53.exe.debug.1220756426">
     <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
+    <lastBuildOptions xsi:type="sdkproject:SdkOptions"/>
   </configuration>
   <configuration name="Release" id="xilinx.gnu.arm.a53.exe.release.265005945" dirty="true">
     <configBuildOptions xsi:type="sdkproject:SdkOptions"/>

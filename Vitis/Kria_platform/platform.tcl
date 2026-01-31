@@ -65,3 +65,39 @@ domain create -name {psu_cortexa53_3} -os {freertos} -proc {psu_cortexa53_3} -ar
 platform generate -domains 
 platform write
 domain -report -json
+platform generate
+domain active {freertos10_xilinx_domain}
+bsp reload
+bsp config total_heap_size "262144"
+bsp write
+bsp reload
+catch {bsp regenerate}
+domain active {psu_cortexa53_1}
+bsp reload
+bsp config total_heap_size "262144"
+bsp config tick_setup "true"
+bsp write
+bsp reload
+catch {bsp regenerate}
+domain active {psu_cortexa53_2}
+bsp reload
+bsp config total_heap_size "262144"
+bsp write
+bsp reload
+catch {bsp regenerate}
+domain active {psu_cortexa53_3}
+bsp reload
+bsp config total_heap_size "262144"
+bsp write
+bsp reload
+catch {bsp regenerate}
+platform generate -domains freertos10_xilinx_domain,psu_cortexa53_1,psu_cortexa53_2,psu_cortexa53_3 
+domain active {freertos10_xilinx_domain}
+bsp reload
+bsp config total_heap_size "262144"
+bsp reload
+bsp config total_heap_size "262144"
+bsp config clocking "false"
+bsp config total_heap_size "262144"
+bsp reload
+platform generate -domains 

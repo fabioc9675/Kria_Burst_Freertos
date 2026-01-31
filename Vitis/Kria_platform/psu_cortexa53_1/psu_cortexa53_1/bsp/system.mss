@@ -11,6 +11,7 @@ BEGIN OS
  PARAMETER SYSTMR_SPEC = true
  PARAMETER stdin = psu_uart_1
  PARAMETER stdout = psu_uart_1
+ PARAMETER total_heap_size = 262144
 END
 
 
