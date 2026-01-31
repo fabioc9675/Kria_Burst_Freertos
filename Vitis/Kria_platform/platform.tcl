@@ -36,3 +36,32 @@ platform generate -domains
 platform clean
 platform config -updatehw {C:/GitHub/KRIA_Burst_Freertos/Vivado/Products/kria_bd_wrapper.xsa}
 platform generate
+platform active {Kria_platform}
+platform config -updatehw {C:/GitHub/KRIA_Burst_Freertos/Vivado/Products/kria_bd_wrapper.xsa}
+domain create -name {psu_cortexa53_0} -os {freertos} -proc {psu_cortexa53_0} -arch {64-bit} -display-name {psu_cortexa53_0} -desc {} -runtime {cpp}
+platform generate -domains 
+domain -report -json
+platform write
+bsp reload
+domain remove psu_cortexa53_0
+platform generate -domains 
+platform write
+domain create -name {psu_cortexa53_1} -os {freertos} -proc {psu_cortexa53_1} -arch {64-bit} -display-name {psu_cortexa53_1} -desc {} -runtime {cpp}
+platform generate -domains 
+domain -report -json
+platform write
+domain create -name {psu_cortexa53_2} -os {standalone} -proc {psu_cortexa53_0} -arch {64-bit} -display-name {psu_cortexa53_2} -desc {} -runtime {cpp}
+platform generate -domains 
+platform write
+domain -report -json
+domain remove psu_cortexa53_2
+platform generate -domains 
+platform write
+domain create -name {psu_cortexa53_2} -os {freertos} -proc {psu_cortexa53_2} -arch {64-bit} -display-name {psu_cortexa53_2} -desc {} -runtime {cpp}
+platform generate -domains 
+domain -report -json
+platform write
+domain create -name {psu_cortexa53_3} -os {freertos} -proc {psu_cortexa53_3} -arch {64-bit} -display-name {psu_cortexa53_3} -desc {} -runtime {cpp}
+platform generate -domains 
+platform write
+domain -report -json
