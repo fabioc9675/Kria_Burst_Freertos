@@ -34,10 +34,13 @@ volatile uint32_t interrupt_counter = 0;
 volatile uint64_t t_isr_timestamp;
 
 // Variables de la DMA
-u32 RxBuffer[SAMPLES] __attribute__((aligned(64))); // Cambiar a u32
+// u32 RxBuffer[SAMPLES] __attribute__((aligned(64))); // Cambiar a u32
 XAxiDma AxiDmaIn;
 
 typedef struct {
+	uint64_t real_tick;
+	uint16_t error;
+	uint32_t checksum;
 	uint32_t time_read;
 	uint32_t time_inter;
 	uint32_t time_slack;
@@ -105,8 +108,8 @@ void vReadMemTask(void *pvParameters) {
 	uint64_t t_current_irq = 0;
 	uint32_t freq = get_hw_freq();
 	int cont = 0;
-
 	int Status;
+	log_entry.error = 0;
 
 	Status = init_dma_in();
 	if (Status != XST_SUCCESS) {
@@ -142,32 +145,45 @@ void vReadMemTask(void *pvParameters) {
 
 		while (get_hw_time() < t_target) {
 			vTaskDelay(pdMS_TO_TICKS(2));
-
 		}
+		// captura del tick real
+		log_entry.real_tick = get_hw_time();
 
 		log_entry.time_read = get_hw_time() - t_start_read;
+
+		// Apuntamos a la memoria compartida
+		uint32_t r_idx = DATA_PIPELINE->read_idx;
+		while (DATA_PIPELINE->packets[r_idx].status != BUF_READY)
+			;
+		UINTPTR shared_addr = (UINTPTR) DATA_PIPELINE->packets[r_idx].payload;
 
 		//--------------------------------------------------
 		// Lectura del DMA
 		//--------------------------------------------------
-		memset(RxBuffer, 0, BYTES_TO_TRANSFER);
+		Xil_DCacheInvalidateRange(shared_addr, BYTES_TO_TRANSFER);
 
-		// El monitor espera el valor 123 en el ciclo 100 del bus.
-		// Como el bus es de 32 bits y el buffer de 16:
-		// Ciclo 100 del bus = Muestra 201 (parte alta) y Muestra 200 (parte baja).
-		if (cont % 3 == 0) {
-			RxBuffer[100] = 112; // Ahora sí, posición 100 es ciclo 100
-		} else if (cont % 3 == 1) {
-			RxBuffer[100] = 123; // Ahora sí, posición 100 es ciclo 100
-		} else {
-			RxBuffer[100] = 0; // Ahora sí, posición 100 es ciclo 100
+		// 4. Verificacion de Checksum
+		uint32_t calc_sum = DATA_PIPELINE->packets[r_idx].payload[0] +
+		DATA_PIPELINE->packets[r_idx].payload[1] +
+		DATA_PIPELINE->packets[r_idx].payload[47997] +
+		DATA_PIPELINE->packets[r_idx].payload[47998];
+		log_entry.checksum = calc_sum;
+
+		if (calc_sum != DATA_PIPELINE->packets[r_idx].checksum) {
+			// Error de integridad (puedes contar errores aqui para el log)
+			log_entry.error += 1;
 		}
 
-		// ¡ESTO ES LO QUE FALTA!
-		Xil_DCacheFlushRange((UINTPTR) RxBuffer, BYTES_TO_TRANSFER);
+		// 5. Modificacion de datos (Inyectar el valor 123 para el monitor)
+		if (cont % 3 == 1) {
+			DATA_PIPELINE->packets[r_idx].payload[100] = 123;
+		}
+
+		// Flush obligatorio antes de disparar el DMA de salida
+		Xil_DCacheFlushRange(shared_addr, BYTES_TO_TRANSFER);
 
 		uint32_t t_i_start = get_hw_time();
-		Status = XAxiDma_SimpleTransfer(&AxiDmaIn, (UINTPTR) RxBuffer,
+		Status = XAxiDma_SimpleTransfer(&AxiDmaIn, shared_addr,
 				BYTES_TO_TRANSFER, XAXIDMA_DMA_TO_DEVICE);
 
 		if (Status != XST_SUCCESS) {
@@ -188,8 +204,11 @@ void vReadMemTask(void *pvParameters) {
 			}
 		}
 
+		DATA_PIPELINE->packets[r_idx].status = BUF_EMPTY;
+		DATA_PIPELINE->read_idx = (r_idx + 1) % NUM_BUFFERS;
+
 		// 4. Invalidar caché: Obligamos al CPU a leer de la RAM, no de su caché
-		Xil_DCacheInvalidateRange((UINTPTR) RxBuffer, BYTES_TO_TRANSFER);
+		Xil_DCacheInvalidateRange(shared_addr, BYTES_TO_TRANSFER);
 
 		uint32_t t_i_end = get_hw_time() - t_i_start;
 
@@ -217,12 +236,16 @@ void vLoggerTask(void *pvParameters) {
 	char multi_line_buf[256];
 
 	// 1. Encabezado actualizado: coincidencia exacta con las columnas del printf
-	xil_printf("\nDATA_START\r\n");
+	//	xil_printf("\nDATA_START\r\n");
+	//	xil_printf("Core,tick,init_op,memory,interrupt,slack\r\n");
 
 	while (1) {
 		if (xQueueReceive(xLogQueue, &data, portMAX_DELAY) == pdPASS) {
 
-			// 2. Calculos de tiempo (usando double o float para precisiÃ³n)
+			// 2. Calculos de tiempo (usando double o float para precision)
+			long real_tick = data.real_tick;
+			int error = data.error;
+			long checksum = data.checksum;
 			float t_read = (float) (data.time_read * 1000000.0 / freq);
 			float t_inter = (float) (data.time_inter * 1000000.0 / freq);
 			float t_slack = (float) (data.time_slack * 1000000.0 / freq);
@@ -230,8 +253,9 @@ void vLoggerTask(void *pvParameters) {
 
 			// Construimos el bloque completo usando snprintf
 			snprintf(multi_line_buf, sizeof(multi_line_buf),
-					"Core %u,\tRead: %.2f (us),\tDMA: %.2f (us), \tInter: %.2f (us), \tSlack: %.2f (us)\r\n",
-					CORE_ID, t_read, t_dma, t_inter, t_slack);
+					"%u,%lu,%.2f,%.2f,%.2f,%.2f,%u,%lu\r\n",
+					CORE_ID, real_tick, t_read, t_dma, t_inter, t_slack, error,
+					checksum);
 
 			// Lo enviamos a la memoria compartida
 			safe_log(multi_line_buf, interrupt_counter);
@@ -302,20 +326,20 @@ int init_dma_in() {
 
 	CfgPtr = XAxiDma_LookupConfig(DMA_IN_DEV_ID);
 	if (!CfgPtr) {
-		xil_printf("No config found for %d\r\n", DMA_IN_DEV_ID);
+//		xil_printf("No config found for %d\r\n", DMA_IN_DEV_ID);
 		return XST_FAILURE;
 	}
 
 	Status = XAxiDma_CfgInitialize(&AxiDmaIn, CfgPtr);
 	if (Status != XST_SUCCESS) {
-		xil_printf("Initialization failed %d\r\n", Status);
+//		xil_printf("Initialization failed %d\r\n", Status);
 		return XST_FAILURE;
 	}
 
 	if (AxiDmaIn.HasMm2S) {
-		xil_printf("Canal MM2S detectado y listo.\r\n");
+//		xil_printf("Canal MM2S detectado y listo.\r\n");
 	} else {
-		xil_printf("Error: El hardware DMA no tiene el canal MM2S activo.\r\n");
+//		xil_printf("Error: El hardware DMA no tiene el canal MM2S activo.\r\n");
 		return XST_FAILURE;
 	}
 

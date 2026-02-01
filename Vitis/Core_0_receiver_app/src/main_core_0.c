@@ -34,10 +34,13 @@ volatile uint32_t interrupt_counter = 0;
 volatile uint64_t t_isr_timestamp;
 
 // Variables de la DMA
-u32 RxBuffer[SAMPLES] __attribute__((aligned(64))); // Cambiar a u32
+//u32 RxBuffer[SAMPLES] __attribute__((aligned(64))); // Cambiar a u32
 XAxiDma AxiDmaOut;                         // Instance of the DMA engine
 
 typedef struct {
+	uint64_t real_tick;
+	uint16_t error;
+	uint32_t checksum;
 	uint32_t time_read;
 	uint32_t time_inter;
 	uint32_t time_slack;
@@ -147,8 +150,8 @@ void vReadMemTask(void *pvParameters) {
 	uint64_t t_last_irq = 0;
 	uint64_t t_current_irq = 0;
 	uint32_t freq = get_hw_freq();
-
 	int Status;
+	log_entry.error = 0;
 
 	Status = init_dma_out();
 	if (Status != XST_SUCCESS) {
@@ -184,25 +187,28 @@ void vReadMemTask(void *pvParameters) {
 
 		while (get_hw_time() < t_target) {
 			vTaskDelay(pdMS_TO_TICKS(2));
-
 		}
+		// captura del tick real
+		log_entry.real_tick = get_hw_time();
 
 		log_entry.time_read = get_hw_time() - t_start_read;
+
+		// Apuntamos a la memoria compartida
+		uint32_t w_idx = DATA_PIPELINE->write_idx;
+		while (DATA_PIPELINE->packets[w_idx].status != BUF_EMPTY)
+			;
+		UINTPTR target_addr = (UINTPTR) DATA_PIPELINE->packets[w_idx].payload; // apunta a la memoria compartida
 
 		//--------------------------------------------------
 		// Lectura del DMA
 		//--------------------------------------------------
-		Xil_DCacheFlushRange((UINTPTR) RxBuffer, BYTES_TO_TRANSFER);
+		Xil_DCacheFlushRange(target_addr, BYTES_TO_TRANSFER);
 
 		uint64_t t_i_start = get_hw_time();
 
-		//		XAxiDma_Reset(&AxiDmaOut);
-		//		while(!XAxiDma_ResetIsDone(&AxiDmaOut));
-
 		// 2. Iniciar transferencia
-		Status = XAxiDma_SimpleTransfer(&AxiDmaOut, (UINTPTR) RxBuffer,
+		Status = XAxiDma_SimpleTransfer(&AxiDmaOut, target_addr,
 				BYTES_TO_TRANSFER, XAXIDMA_DEVICE_TO_DMA);
-
 		if (Status != XST_SUCCESS) {
 			xil_printf("Error al iniciar: %d\r\n", Status);
 			vTaskDelay(pdMS_TO_TICKS(1000));
@@ -222,7 +228,21 @@ void vReadMemTask(void *pvParameters) {
 		}
 
 		// 4. Invalidar cachÈ: Obligamos al CPU a leer de la RAM, no de su cachÈ
-		Xil_DCacheInvalidateRange((UINTPTR) RxBuffer, BYTES_TO_TRANSFER);
+		Xil_DCacheInvalidateRange(target_addr, BYTES_TO_TRANSFER);
+
+		// 3. Checksum simple y entrega
+		uint32_t dat_sum = DATA_PIPELINE->packets[w_idx].payload[0]
+				+ DATA_PIPELINE->packets[w_idx].payload[1]
+				+ DATA_PIPELINE->packets[w_idx].payload[47997]
+				+ DATA_PIPELINE->packets[w_idx].payload[47998];
+		DATA_PIPELINE->packets[w_idx].checksum = dat_sum;
+		log_entry.checksum = dat_sum;
+
+		// Barrera de memoria (Asegura que el checksum se escriba antes que el status)
+		__asm__ __volatile__ ("dmb sy" : : : "memory");
+
+		DATA_PIPELINE->packets[w_idx].status = BUF_READY;
+		DATA_PIPELINE->write_idx = (w_idx + 1) % NUM_BUFFERS;
 
 		uint64_t t_i_end = get_hw_time() - t_i_start;
 
@@ -249,11 +269,15 @@ void vLoggerTask(void *pvParameters) {
 
 	// 1. Encabezado actualizado: coincidencia exacta con las columnas del printf
 	xil_printf("\nDATA_START\r\n");
+	xil_printf("Core,tick,init_op,memory,interrupt,slack,error,checksum\r\n");
 
 	while (1) {
 		if (xQueueReceive(xLogQueue, &data, portMAX_DELAY) == pdPASS) {
 
-			// 2. Calculos de tiempo (usando double o float para precisi√≥n)
+			// 2. Calculos de tiempo (usando double o float para precision)
+			long real_tick = data.real_tick;
+			int error = data.error;
+			long checksum = data.checksum;
 			float t_read = (float) (data.time_read * 1000000.0 / freq);
 			float t_inter = (float) (data.time_inter * 1000000.0 / freq);
 			float t_slack = (float) (data.time_slack * 1000000.0 / freq);
@@ -261,8 +285,9 @@ void vLoggerTask(void *pvParameters) {
 
 			// Construimos el bloque completo usando snprintf
 			snprintf(multi_line_buf, sizeof(multi_line_buf),
-					"Core %u,\tRead: %.2f (us),\tDMA: %.2f (us), \tInter: %.2f (us), \tSlack: %.2f (us)\r\n",
-					CORE_ID, t_read, t_dma, t_inter, t_slack);
+					"%u,%lu,%.2f,%.2f,%.2f,%.2f,%u,%lu\r\n",
+					CORE_ID, real_tick, t_read, t_dma, t_inter, t_slack, error,
+					checksum);
 
 			// Lo enviamos a la memoria compartida
 			safe_log(multi_line_buf, interrupt_counter);
