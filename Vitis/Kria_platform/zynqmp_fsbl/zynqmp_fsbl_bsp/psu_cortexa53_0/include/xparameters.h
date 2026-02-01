@@ -64,7 +64,7 @@
 #define XPAR_AXI_DMA_IN_S2MM_BURST_SIZE 16
 #define XPAR_AXI_DMA_IN_MICRO_DMA 0
 #define XPAR_AXI_DMA_IN_ADDR_WIDTH 32
-#define XPAR_AXI_DMA_IN_SG_LENGTH_WIDTH 24
+#define XPAR_AXI_DMA_IN_SG_LENGTH_WIDTH 16
 
 
 /* Definitions for peripheral AXI_DMA_OUT */
@@ -86,7 +86,7 @@
 #define XPAR_AXI_DMA_OUT_S2MM_BURST_SIZE 256
 #define XPAR_AXI_DMA_OUT_MICRO_DMA 0
 #define XPAR_AXI_DMA_OUT_ADDR_WIDTH 32
-#define XPAR_AXI_DMA_OUT_SG_LENGTH_WIDTH 24
+#define XPAR_AXI_DMA_OUT_SG_LENGTH_WIDTH 16
 
 
 /******************************************************************/
@@ -109,7 +109,7 @@
 #define XPAR_AXIDMA_0_S2MM_BURST_SIZE 16
 #define XPAR_AXIDMA_0_MICRO_DMA 0
 #define XPAR_AXIDMA_0_c_addr_width 32
-#define XPAR_AXIDMA_0_c_sg_length_width 24
+#define XPAR_AXIDMA_0_c_sg_length_width 16
 
 /* Canonical definitions for peripheral AXI_DMA_OUT */
 #define XPAR_AXIDMA_1_DEVICE_ID XPAR_AXI_DMA_OUT_DEVICE_ID
@@ -129,7 +129,7 @@
 #define XPAR_AXIDMA_1_S2MM_BURST_SIZE 256
 #define XPAR_AXIDMA_1_MICRO_DMA 0
 #define XPAR_AXIDMA_1_c_addr_width 32
-#define XPAR_AXIDMA_1_c_sg_length_width 24
+#define XPAR_AXIDMA_1_c_sg_length_width 16
 
 
 /******************************************************************/

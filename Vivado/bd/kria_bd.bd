@@ -2215,7 +2215,7 @@
             "value": "16"
           },
           "PINC1": {
-            "value": "1101000110110111001"
+            "value": "101000000000000000000000"
           },
           "Parameter_Entry": {
             "value": "Hardware_Parameters"
@@ -2253,7 +2253,7 @@
             "value": "256"
           },
           "c_sg_length_width": {
-            "value": "24"
+            "value": "16"
           }
         },
         "interface_ports": {
@@ -2397,7 +2397,7 @@
             "value": "256"
           },
           "c_sg_length_width": {
-            "value": "24"
+            "value": "16"
           }
         },
         "interface_ports": {
@@ -2433,7 +2433,7 @@
         "inst_hier_path": "system_ila_0",
         "parameters": {
           "C_DATA_DEPTH": {
-            "value": "2048"
+            "value": "8192"
           },
           "C_MON_TYPE": {
             "value": "MIX"

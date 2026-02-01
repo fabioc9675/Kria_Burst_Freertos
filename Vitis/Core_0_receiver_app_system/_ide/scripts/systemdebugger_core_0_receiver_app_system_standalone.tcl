@@ -30,11 +30,16 @@ catch {psu_protection}
 targets -set -nocase -filter {name =~ "*A53*#0"}
 rst -processor
 dow C:/GitHub/KRIA_Burst_Freertos/Vitis/Core_0_receiver_app/Debug/Core_0_receiver_app.elf
+targets -set -nocase -filter {name =~ "*A53*#1"}
+rst -processor
+dow C:/GitHub/KRIA_Burst_Freertos/Vitis/Core_1_fft_app/Debug/Core_1_fft_app.elf
 targets -set -nocase -filter {name =~ "*A53*#3"}
 rst -processor
 dow C:/GitHub/KRIA_Burst_Freertos/Vitis/Core_3_transmiter_app/Debug/Core_3_transmiter_app.elf
 configparams force-mem-access 0
 targets -set -nocase -filter {name =~ "*A53*#0"}
+con
+targets -set -nocase -filter {name =~ "*A53*#1"}
 con
 targets -set -nocase -filter {name =~ "*A53*#3"}
 con

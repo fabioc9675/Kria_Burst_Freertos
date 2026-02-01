@@ -5,6 +5,7 @@
 	<projects>
 		<project>Core_0_receiver_app</project>
 		<project>Core_3_transmiter_app</project>
+		<project>Core_1_fft_app</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

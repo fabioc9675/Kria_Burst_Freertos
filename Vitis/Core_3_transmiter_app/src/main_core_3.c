@@ -15,7 +15,7 @@
 // --- DMA de salida desde el PL, entrada al PS ---
 #define DMA_IN_DEV_ID XPAR_AXI_DMA_IN_DEVICE_ID
 #define DMA_IN_IRQ_ID XPAR_FABRIC_AXI_DMA_IN_S2MM_INTROUT_INTR
-#define SAMPLES 48000
+#define SAMPLES 4096
 #define BUFFER_SIZE (SAMPLES * 2)
 
 // --- CONFIGURACION ---
@@ -45,6 +45,7 @@ typedef struct {
 	uint32_t time_inter;
 	uint32_t time_slack;
 	uint32_t time_dma;
+	uint16_t pkg;
 } TBenchmarkData;
 
 // Functions to measure time
@@ -71,17 +72,20 @@ void vLoggerTask(void *pvParameters);
 
 int main(void) {
 	// 1. Inicializar Ring Buffer
-	volatile uint8_t *pShared = (volatile uint8_t *) SHARED_MEM_BASE;
-	for (size_t i = 0; i < sizeof(shared_log_t); i++) {
-		pShared[i] = 0;
-	}
+//	volatile uint8_t *pShared = (volatile uint8_t *) SHARED_MEM_BASE;
+//	for (size_t i = 0; i < sizeof(shared_log_t); i++) {
+//		pShared[i] = 0;
+//	}
+
+// En el main del Core 3, antes del scheduler:
+	Xil_DCacheInvalidateRange(SHARED_MEM_BASE, 0x100000);
 
 	xIrqSemaphore = xSemaphoreCreateBinary();
 	// IMPORTANTE: Crear la cola para 10 registros
-	xLogQueue = xQueueCreate(10, sizeof(TBenchmarkData));
+	xLogQueue = xQueueCreate(100, sizeof(TBenchmarkData));
 
 	// 2. Configurar su propia interrupciï¿½n (ID 121U para Core 0)
-	SetupInterruptSystem(&xInterruptController);
+	// SetupInterruptSystem(&xInterruptController);
 
 	// 3. Crear Tarea de Benchmark propia
 	xTaskCreate(vReadMemTask, "Bench0", 4096, NULL, tskIDLE_PRIORITY + 5,
@@ -110,6 +114,7 @@ void vReadMemTask(void *pvParameters) {
 	int cont = 0;
 	int Status;
 	log_entry.error = 0;
+	log_entry.pkg = 0;
 
 	Status = init_dma_in();
 	if (Status != XST_SUCCESS) {
@@ -118,8 +123,23 @@ void vReadMemTask(void *pvParameters) {
 	}
 
 	// FIJAMOS EL TAMAÑO: 48000 muestras de 16 bits = 96000 bytes
-	const int FIXED_SAMPLES = 48000;
+	const int FIXED_SAMPLES = SAMPLES;
 	const int BYTES_TO_TRANSFER = FIXED_SAMPLES * 4;
+
+	// vTaskDelay(100);
+	// 2. Avisar que estoy listo
+	SYNC_BARRIER->core3_ready = 1;
+	Xil_DCacheFlushRange((UINTPTR) SYNC_BARRIER, sizeof(sync_barrier_t));
+
+	// 3. BLOQUEARSE hasta que el Core 0 de el "Go"
+	while (!SYNC_BARRIER->system_go) {
+		Xil_DCacheInvalidateRange((UINTPTR) SYNC_BARRIER,
+				sizeof(sync_barrier_t));
+		vTaskDelay(1);
+	}
+
+	// 2. Configurar su propia interrupcion (ID 121U para Core 0)
+	SetupInterruptSystem(&xInterruptController);
 
 	for (int i = 0; i < TEST_COUNT; i++) {
 		// 1. Esperar Pulso del PL
@@ -140,21 +160,30 @@ void vReadMemTask(void *pvParameters) {
 		uint64_t t_start_read = get_hw_time();
 
 		// Cálculo de ciclos para 7ms: (Frecuencia * 0.007)
-		uint64_t cycles_to_wait = (freq * 7) / 1000;
-		uint64_t t_target = t_start_read + cycles_to_wait;
-
-		while (get_hw_time() < t_target) {
-			vTaskDelay(pdMS_TO_TICKS(2));
-		}
-		// captura del tick real
-		log_entry.real_tick = get_hw_time();
-
-		log_entry.time_read = get_hw_time() - t_start_read;
+//		uint64_t cycles_to_wait = (freq * 7) / 1000;
+//		uint64_t t_target = t_start_read + cycles_to_wait;
+//
+//		while (get_hw_time() < t_target) {
+//			vTaskDelay(pdMS_TO_TICKS(2));
+//		}
+		// Barrera de memoria (Asegura que el checksum se escriba antes que el status)
+		// __asm__ __volatile__ ("dmb sy" : : : "memory");
 
 		// Apuntamos a la memoria compartida
 		uint32_t r_idx = DATA_PIPELINE->read_idx;
-		while (DATA_PIPELINE->packets[r_idx].status != BUF_READY)
-			;
+		while (1) {
+			Xil_DCacheInvalidateRange(
+					(UINTPTR) &DATA_PIPELINE->packets[r_idx].status, 32);
+			if (DATA_PIPELINE->packets[r_idx].status == BUF_READY_FOR_OUT)
+				break;
+			asm volatile("yield");
+		}
+
+		// captura del tick real
+		log_entry.real_tick = get_hw_time();
+		log_entry.pkg += 1;
+		log_entry.time_read = get_hw_time() - t_start_read;
+
 		UINTPTR shared_addr = (UINTPTR) DATA_PIPELINE->packets[r_idx].payload;
 
 		//--------------------------------------------------
@@ -165,8 +194,8 @@ void vReadMemTask(void *pvParameters) {
 		// 4. Verificacion de Checksum
 		uint32_t calc_sum = DATA_PIPELINE->packets[r_idx].payload[0] +
 		DATA_PIPELINE->packets[r_idx].payload[1] +
-		DATA_PIPELINE->packets[r_idx].payload[47997] +
-		DATA_PIPELINE->packets[r_idx].payload[47998];
+		DATA_PIPELINE->packets[r_idx].payload[4092] +
+		DATA_PIPELINE->packets[r_idx].payload[4093];
 		log_entry.checksum = calc_sum;
 
 		if (calc_sum != DATA_PIPELINE->packets[r_idx].checksum) {
@@ -202,6 +231,7 @@ void vReadMemTask(void *pvParameters) {
 						"TIMEOUT: El DMA sigue ocupado. La PL envio TLAST?\r\n");
 				break;
 			}
+			asm volatile("yield");
 		}
 
 		DATA_PIPELINE->packets[r_idx].status = BUF_EMPTY;
@@ -224,8 +254,13 @@ void vReadMemTask(void *pvParameters) {
 
 		xQueueSend(xLogQueue, &log_entry, 0);
 
-		vTaskDelay(pdMS_TO_TICKS(2));
+		// vTaskDelay(pdMS_TO_TICKS(2));
 	}
+	// En lugar de borrar la tarea
+	while (1) {
+		vTaskDelay(pdMS_TO_TICKS(1000));
+	}
+
 	vTaskDelete(NULL);
 }
 
@@ -245,6 +280,7 @@ void vLoggerTask(void *pvParameters) {
 			// 2. Calculos de tiempo (usando double o float para precision)
 			long real_tick = data.real_tick;
 			int error = data.error;
+			int pkg = data.pkg;
 			long checksum = data.checksum;
 			float t_read = (float) (data.time_read * 1000000.0 / freq);
 			float t_inter = (float) (data.time_inter * 1000000.0 / freq);
@@ -253,9 +289,9 @@ void vLoggerTask(void *pvParameters) {
 
 			// Construimos el bloque completo usando snprintf
 			snprintf(multi_line_buf, sizeof(multi_line_buf),
-					"%u,%lu,%.2f,%.2f,%.2f,%.2f,%u,%lu\r\n",
+					"%u,%lu,%.2f,%.2f,%.2f,%.2f,%u,%lu,%u\r\n",
 					CORE_ID, real_tick, t_read, t_dma, t_inter, t_slack, error,
-					checksum);
+					checksum, pkg);
 
 			// Lo enviamos a la memoria compartida
 			safe_log(multi_line_buf, interrupt_counter);

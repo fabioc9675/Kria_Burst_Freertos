@@ -13,7 +13,7 @@
 #define DMA_IN_DEV_ID XPAR_AXI_DMA_IN_DEVICE_ID
 #define DMA_IN_IRQ_ID XPAR_FABRIC_AXI_DMA_IN_S2MM_INTROUT_INTR
 
-#define SAMPLES 48000
+#define SAMPLES 4096
 #define BUFFER_SIZE (SAMPLES * 2)
 
 int vect_s[7] = { 1024, 2048, 4096, 8192, 16384, 32768, 48000 };
@@ -75,7 +75,7 @@ void dma_transfer_task(void *pvParameters) {
 	}
 
 	// FIJAMOS EL TAMAÑO: 48000 muestras de 16 bits = 96000 bytes
-	const int FIXED_SAMPLES = 48000;
+	const int FIXED_SAMPLES = 4096;
 	const int BYTES_TO_TRANSFER = FIXED_SAMPLES * 4;
 	//const int BYTES_TO_TRANSFER = FIXED_SAMPLES; //* sizeof(u16);
 

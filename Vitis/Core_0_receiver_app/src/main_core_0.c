@@ -15,7 +15,7 @@
 // --- DMA de salida desde el PL, entrada al PS ---
 #define DMA_OUT_DEV_ID XPAR_AXI_DMA_OUT_DEVICE_ID
 #define DMA_OUT_IRQ_ID XPAR_FABRIC_AXI_DMA_OUT_S2MM_INTROUT_INTR
-#define SAMPLES 48000
+#define SAMPLES 4096
 #define BUFFER_SIZE (SAMPLES * 2)
 
 // --- CONFIGURACION ---
@@ -45,6 +45,7 @@ typedef struct {
 	uint32_t time_inter;
 	uint32_t time_slack;
 	uint32_t time_dma;
+	uint16_t pkg;
 } TBenchmarkData;
 
 // Functions to measure time
@@ -78,12 +79,31 @@ int main(void) {
 		pShared[i] = 0;
 	}
 
+	// Inicializar punteros del Pipeline específicamente
+	DATA_PIPELINE->write_idx = 0;
+	DATA_PIPELINE->read_idx = 0;
+	DATA_PIPELINE->fft_idx = 0;
+	for (int i = 0; i < NUM_BUFFERS; i++) {
+		DATA_PIPELINE->packets[i].status = BUF_EMPTY;
+	}
+
+	// --- PASO 2: Forzar escritura en RAM ---
+	// Muy importante: Asegurar que los otros núcleos vean la memoria limpia
+	Xil_DCacheFlushRange(SHARED_MEM_BASE,
+			sizeof(shared_log_t) + sizeof(pipeline_data_t));
+
+	SYNC_BARRIER->core0_ready = 0;
+	SYNC_BARRIER->core1_ready = 0;
+	SYNC_BARRIER->core3_ready = 0;
+	SYNC_BARRIER->system_go = 0;
+	Xil_DCacheFlushRange((UINTPTR)SYNC_BARRIER, sizeof(sync_barrier_t));
+
 	xIrqSemaphore = xSemaphoreCreateBinary();
 	// IMPORTANTE: Crear la cola para 10 registros
-	xLogQueue = xQueueCreate(10, sizeof(TBenchmarkData));
+	xLogQueue = xQueueCreate(20, sizeof(TBenchmarkData));
 
 	// 2. Configurar su propia interrupciï¿½n (ID 121U para Core 0)
-	SetupInterruptSystem(&xInterruptController);
+	//SetupInterruptSystem(&xInterruptController);
 
 	// 3. Crear Tarea de Benchmark propia
 	xTaskCreate(vReadMemTask, "Bench0", 4096, NULL, tskIDLE_PRIORITY + 5,
@@ -152,6 +172,7 @@ void vReadMemTask(void *pvParameters) {
 	uint32_t freq = get_hw_freq();
 	int Status;
 	log_entry.error = 0;
+	log_entry.pkg = 0;
 
 	Status = init_dma_out();
 	if (Status != XST_SUCCESS) {
@@ -160,8 +181,26 @@ void vReadMemTask(void *pvParameters) {
 	}
 
 	// FIJAMOS EL TAMAÑO: 48000 muestras de 16 bits = 96000 bytes
-	const int FIXED_SAMPLES = 48000;
+	const int FIXED_SAMPLES = SAMPLES;
 	const int BYTES_TO_TRANSFER = FIXED_SAMPLES * 4;
+
+	// vTaskDelay(100);
+	// 2. Avisar que Core 0 esta listo
+	SYNC_BARRIER->core0_ready = 1;
+	Xil_DCacheFlushRange((UINTPTR)SYNC_BARRIER, sizeof(sync_barrier_t));
+
+	// 3. Esperar a que los demas reporten listo
+	while (!(SYNC_BARRIER->core1_ready && SYNC_BARRIER->core3_ready)) {
+	    Xil_DCacheInvalidateRange((UINTPTR)SYNC_BARRIER, sizeof(sync_barrier_t));
+	    vTaskDelay(1);
+	}
+
+	// 4. Dar la orden de inicio global
+	SYNC_BARRIER->system_go = 1;
+	Xil_DCacheFlushRange((UINTPTR)SYNC_BARRIER, sizeof(sync_barrier_t));
+
+	// 2. Configurar su propia interrupcion (ID 121U para Core 0)
+	SetupInterruptSystem(&xInterruptController);
 
 	for (int i = 0; i < TEST_COUNT; i++) {
 		// 1. Esperar Pulso del PL
@@ -182,21 +221,31 @@ void vReadMemTask(void *pvParameters) {
 		uint64_t t_start_read = get_hw_time();
 
 		// Cálculo de ciclos para 1ms: (Frecuencia * 0.001)
-		uint64_t cycles_to_wait = (freq * 1) / 1000;
-		uint64_t t_target = t_start_read + cycles_to_wait;
-
-		while (get_hw_time() < t_target) {
-			vTaskDelay(pdMS_TO_TICKS(2));
-		}
-		// captura del tick real
-		log_entry.real_tick = get_hw_time();
-
-		log_entry.time_read = get_hw_time() - t_start_read;
+//		uint64_t cycles_to_wait = (freq * 1) / 1000;
+//		uint64_t t_target = t_start_read + cycles_to_wait;
+//
+//		while (get_hw_time() < t_target) {
+//			vTaskDelay(pdMS_TO_TICKS(2));
+//		}
 
 		// Apuntamos a la memoria compartida
 		uint32_t w_idx = DATA_PIPELINE->write_idx;
-		while (DATA_PIPELINE->packets[w_idx].status != BUF_EMPTY)
-			;
+
+
+		while (1) {
+					Xil_DCacheInvalidateRange(
+							(UINTPTR) &DATA_PIPELINE->packets[w_idx].status, 32);
+					if (DATA_PIPELINE->packets[w_idx].status == BUF_EMPTY)
+						break;
+					asm volatile("yield");
+				}
+
+
+		// captura del tick real
+		log_entry.real_tick = get_hw_time();
+		log_entry.pkg += 1;
+		log_entry.time_read = get_hw_time() - t_start_read;
+
 		UINTPTR target_addr = (UINTPTR) DATA_PIPELINE->packets[w_idx].payload; // apunta a la memoria compartida
 
 		//--------------------------------------------------
@@ -225,23 +274,26 @@ void vReadMemTask(void *pvParameters) {
 						"TIMEOUT: El DMA sigue ocupado. La PL envio TLAST?\r\n");
 				break;
 			}
+			asm volatile("yield");
 		}
 
 		// 4. Invalidar caché: Obligamos al CPU a leer de la RAM, no de su caché
 		Xil_DCacheInvalidateRange(target_addr, BYTES_TO_TRANSFER);
 
+		DATA_PIPELINE->packets[w_idx].payload[1] = interrupt_counter;
+
 		// 3. Checksum simple y entrega
 		uint32_t dat_sum = DATA_PIPELINE->packets[w_idx].payload[0]
 				+ DATA_PIPELINE->packets[w_idx].payload[1]
-				+ DATA_PIPELINE->packets[w_idx].payload[47997]
-				+ DATA_PIPELINE->packets[w_idx].payload[47998];
+				+ DATA_PIPELINE->packets[w_idx].payload[4092]
+				+ DATA_PIPELINE->packets[w_idx].payload[4093];
 		DATA_PIPELINE->packets[w_idx].checksum = dat_sum;
 		log_entry.checksum = dat_sum;
 
 		// Barrera de memoria (Asegura que el checksum se escriba antes que el status)
 		__asm__ __volatile__ ("dmb sy" : : : "memory");
 
-		DATA_PIPELINE->packets[w_idx].status = BUF_READY;
+		DATA_PIPELINE->packets[w_idx].status = BUF_READY_FOR_FFT;
 		DATA_PIPELINE->write_idx = (w_idx + 1) % NUM_BUFFERS;
 
 		uint64_t t_i_end = get_hw_time() - t_i_start;
@@ -256,7 +308,12 @@ void vReadMemTask(void *pvParameters) {
 
 		xQueueSend(xLogQueue, &log_entry, 0);
 
-		vTaskDelay(pdMS_TO_TICKS(2));
+		// vTaskDelay(pdMS_TO_TICKS(2));
+	}
+
+	// En lugar de borrar la tarea
+	while (1) {
+		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 	vTaskDelete(NULL);
 }
@@ -269,7 +326,8 @@ void vLoggerTask(void *pvParameters) {
 
 	// 1. Encabezado actualizado: coincidencia exacta con las columnas del printf
 	xil_printf("\nDATA_START\r\n");
-	xil_printf("Core,tick,init_op,memory,interrupt,slack,error,checksum\r\n");
+	xil_printf(
+			"Core,tick,init_op,memory,interrupt,slack,error,checksum,package\r\n");
 
 	while (1) {
 		if (xQueueReceive(xLogQueue, &data, portMAX_DELAY) == pdPASS) {
@@ -277,6 +335,7 @@ void vLoggerTask(void *pvParameters) {
 			// 2. Calculos de tiempo (usando double o float para precision)
 			long real_tick = data.real_tick;
 			int error = data.error;
+			int pkg = data.pkg;
 			long checksum = data.checksum;
 			float t_read = (float) (data.time_read * 1000000.0 / freq);
 			float t_inter = (float) (data.time_inter * 1000000.0 / freq);
@@ -285,9 +344,9 @@ void vLoggerTask(void *pvParameters) {
 
 			// Construimos el bloque completo usando snprintf
 			snprintf(multi_line_buf, sizeof(multi_line_buf),
-					"%u,%lu,%.2f,%.2f,%.2f,%.2f,%u,%lu\r\n",
+					"%u,%lu,%.2f,%.2f,%.2f,%.2f,%u,%lu,%u\r\n",
 					CORE_ID, real_tick, t_read, t_dma, t_inter, t_slack, error,
-					checksum);
+					checksum, pkg);
 
 			// Lo enviamos a la memoria compartida
 			safe_log(multi_line_buf, interrupt_counter);

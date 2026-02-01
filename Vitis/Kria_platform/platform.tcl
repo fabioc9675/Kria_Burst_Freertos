@@ -101,3 +101,28 @@ bsp config clocking "false"
 bsp config total_heap_size "262144"
 bsp reload
 platform generate -domains 
+domain active {psu_cortexa53_1}
+bsp reload
+bsp config total_heap_size "262144"
+bsp write
+domain active {freertos10_xilinx_domain}
+bsp reload
+bsp write
+domain active {psu_cortexa53_2}
+bsp reload
+bsp write
+platform generate -domains 
+platform config -updatehw {C:/GitHub/KRIA_Burst_Freertos/Vivado/Products/kria_bd_wrapper.xsa}
+platform generate -domains 
+domain active {zynqmp_fsbl}
+domain active {freertos10_xilinx_domain}
+bsp reload
+domain active {psu_cortexa53_1}
+bsp reload
+bsp reload
+domain active {freertos10_xilinx_domain}
+bsp write
+platform generate -domains 
+platform generate
+platform clean
+platform generate
