@@ -542,3 +542,19 @@ timestamp=[2026-02-01 12:24:23], mode=BUILD, duration=0:00:01.033, duration_ms=1
 timestamp=[2026-02-01 12:24:24], mode=BUILD, duration=0:00:00.722, duration_ms=722, data={name=Core_3_transmiter_app, configuration=Debug, clean_build=false}
 timestamp=[2026-02-01 12:24:25], mode=BUILD, duration=0:00:00.920, duration_ms=920, data={name=Core_0_receiver_app, configuration=Debug, clean_build=false}
 timestamp=[2026-02-01 12:24:26], mode=BUILD, duration=0:00:00.105, duration_ms=105, data={name=Core_0_receiver_app_system, configuration=Emulation-SW, clean_build=false}
+timestamp=[2026-02-05 00:19:10], mode=WORKBENCH_START, duration=0:00:07.267, duration_ms=7267, data={}
+timestamp=[2026-02-05 00:19:11], mode=WORKBENCH_UI_INIT, duration=0:00:01.014, duration_ms=1014, data={editors_count=14, platform_editors_count=3, projects_count=8, platform_projects_count=1, active_platform_editor=false, projects=Core_0_receiver_app,Core_0_receiver_app_system,Core_1_fft_app,Core_3_transmiter_app,Kria_platform,RemoteSystemsTempFiles,dma_app,dma_app_system}
+timestamp=[2026-02-05 00:19:13], mode=PLATFORM_REPOSITORY_INIT, duration=0:00:00.616, duration_ms=616, data={}
+timestamp=[2026-02-05 00:28:57], mode=APP_CREATION, duration=0:00:02.227, duration_ms=2227, data={name=core_0_cont_app, project_type=sdk, os=freertos10_xilinx, processor=cortex-a53, runtime=C/C++, platform=Kria_platform, application_type=application}
+timestamp=[2026-02-05 00:54:52], mode=PLATFORM_GENERATION, duration=0:00:41.141, duration_ms=41141, data={name=Kria_platform}
+timestamp=[2026-02-05 00:55:12], mode=BUILD, duration=0:00:00.338, duration_ms=338, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 00:58:48], mode=BUILD, duration=0:00:00.283, duration_ms=283, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 01:01:03], mode=BUILD, duration=0:00:01.706, duration_ms=1706, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 01:02:01], mode=BUILD, duration=0:00:00.750, duration_ms=750, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 01:05:46], mode=BUILD, duration=0:00:00.767, duration_ms=767, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 01:06:50], mode=BUILD, duration=0:00:00.747, duration_ms=747, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 01:09:30], mode=BUILD, duration=0:00:00.751, duration_ms=751, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 01:11:47], mode=BUILD, duration=0:00:00.771, duration_ms=771, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 01:14:41], mode=BUILD, duration=0:00:00.773, duration_ms=773, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 01:16:03], mode=BUILD, duration=0:00:00.776, duration_ms=776, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 01:20:09], mode=BUILD, duration=0:00:00.752, duration_ms=752, data={name=core_0_cont_app, configuration=Debug, clean_build=false}

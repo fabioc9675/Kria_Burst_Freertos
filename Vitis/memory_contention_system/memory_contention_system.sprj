@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ASCII"?>
+<systemproject:SystemProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdsproject="http://www.xilinx.com/sdsproject" xmlns:systemproject="http://www.xilinx.com/systemproject" name="memory_contention_system" platform="C:/GitHub/KRIA_Burst_Freertos/Vitis/Kria_platform/export/Kria_platform/Kria_platform.xpfm" platformUID="xilinx:kr260_som:kria_bd:1.4(custom)" sysConfig="Kria_platform" runtime="C/C++" rootFSLocation="" linuxImage="" sysroot="">
+  <configuration name="Emulation-SW" id="com.xilinx.sdx.system.managedbuilder.swemu.configuration.1032718610">
+    <configBuildOptions xsi:type="systemproject:SystemOptions">
+      <applications name="core_0_cont_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
+      <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
+    </configBuildOptions>
+  </configuration>
+  <configuration name="Emulation-HW" id="com.xilinx.sdx.system.managedbuilder.hwemu.configuration.1115240633">
+    <configBuildOptions xsi:type="systemproject:SystemOptions" target="hw_emu">
+      <applications name="core_0_cont_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
+      <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
+    </configBuildOptions>
+  </configuration>
+  <configuration name="Hardware" id="com.xilinx.sdx.system.managedbuilder.hw.configuration.633437086">
+    <configBuildOptions xsi:type="systemproject:SystemOptions" target="hw">
+      <applications name="core_0_cont_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
+      <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
+    </configBuildOptions>
+  </configuration>
+</systemproject:SystemProject>
