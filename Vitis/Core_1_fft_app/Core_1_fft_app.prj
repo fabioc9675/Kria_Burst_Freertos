@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<sdkproject:SdkProject xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sdkproject="http://www.xilinx.com/sdkproject" name="Core_1_fft_app" location="C:/GitHub/KRIA_Burst_Freertos/Vitis/Core_1_fft_app" platform="C:/GitHub/KRIA_Burst_Freertos/Vitis/Kria_platform/export/Kria_platform/Kria_platform.xpfm" platformUID="xilinx:kr260_som:kria_bd:1.4(custom)" systemProject="Core_0_receiver_app_system" sysConfig="Kria_platform" runtime="C/C++" cpu="psu_cortexa53_1" cpuInstance="psu_cortexa53_1" os="freertos10_xilinx" mssSignature="f423a1f76ba56ae1a6ad8292ad9eba49">
+  <configuration name="Debug" id="xilinx.gnu.arm.a53.exe.debug.104108501">
+    <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
+    <lastBuildOptions xsi:type="sdkproject:SdkOptions"/>
+  </configuration>
+  <configuration name="Release" id="xilinx.gnu.arm.a53.exe.release.740608176" dirty="true">
+    <configBuildOptions xsi:type="sdkproject:SdkOptions"/>
+  </configuration>
+  <template appTemplateName="freertos_hello_world" hasBspSettings="true"/>
+</sdkproject:SdkProject>

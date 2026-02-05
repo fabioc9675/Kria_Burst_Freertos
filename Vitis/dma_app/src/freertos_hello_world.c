@@ -7,18 +7,38 @@
 #include "xil_printf.h"
 #include "xil_cache.h"
 
-#define DMA_DEV_ID XPAR_AXIDMA_0_DEVICE_ID
-#define DMA_IRQ_ID XPAR_FABRIC_AXIDMA_0_VEC_ID
+#define DMA_OUT_DEV_ID XPAR_AXI_DMA_OUT_DEVICE_ID
+#define DMA_OUT_IRQ_ID XPAR_FABRIC_AXI_DMA_OUT_S2MM_INTROUT_INTR
 
-#define SAMPLES 48000
+#define DMA_IN_DEV_ID XPAR_AXI_DMA_IN_DEVICE_ID
+#define DMA_IN_IRQ_ID XPAR_FABRIC_AXI_DMA_IN_S2MM_INTROUT_INTR
+
+#define SAMPLES 4096
 #define BUFFER_SIZE (SAMPLES * 2)
 
-u16 RxBuffer[SAMPLES] __attribute__((aligned(64)));
-XAxiDma AxiDma;                         // Instance of the DMA engine
+int vect_s[7] = { 1024, 2048, 4096, 8192, 16384, 32768, 48000 };
+
+u32 RxBuffer[SAMPLES] __attribute__((aligned(64))); // Cambiar a u32
+XAxiDma AxiDmaOut;                         // Instance of the DMA engine
+XAxiDma AxiDmaIn;                          // Instance of the DMA engine
 XScuGic InterruptController;            // Instance of the Interrupt Controller
 SemaphoreHandle_t xSemaphoreDMA = NULL; // Semaphore for DMA completion
 
-int init_dma();
+// --- HELPERS TIEMPO ARM A53 ---
+static inline uint64_t get_hw_time(void) {
+	uint64_t val;
+	asm volatile("mrs %0, cntpct_el0" : "=r" (val));
+	return val;
+}
+
+static inline uint32_t get_hw_freq(void) {
+	uint32_t val;
+	asm volatile("mrs %0, cntfrq_el0" : "=r" (val));
+	return val;
+}
+
+int init_dma_out();
+int init_dma_in();
 void dma_transfer_task(void *pvParameters);
 
 int main(void) {
@@ -39,71 +59,178 @@ int main(void) {
 
 void dma_transfer_task(void *pvParameters) {
 	int Status;
-	xil_printf("DMA Transfer Task Started\r\n");
+	int cont = 0;
+	uint64_t freq = get_hw_freq();
 
-	Status = init_dma();
+	Status = init_dma_out();
 	if (Status != XST_SUCCESS) {
-		xil_printf("DMA Initialization Failed\r\n");
+		xil_printf("DMA OUT Initialization Failed\r\n");
 		vTaskDelete(NULL);
 	}
 
-	memset(RxBuffer, 0, BUFFER_SIZE);
-	Xil_DCacheFlushRange((UINTPTR) RxBuffer, BUFFER_SIZE);
-
-	while (1) {
-		// Start the DMA transfer
-		Status = XAxiDma_SimpleTransfer(&AxiDma, (UINTPTR) RxBuffer,
-		BUFFER_SIZE, XAXIDMA_DEVICE_TO_DMA);
-
-		if (Status != XST_SUCCESS) {
-			xil_printf("DMA Transfer Failed %d\r\n", Status);
-			vTaskDelete(NULL);
-		}
-
-		// Wait for the DMA transfer to complete
-		xil_printf("Waiting for DMA transfer to complete...\r\n");
-		while (XAxiDma_Busy(&AxiDma, XAXIDMA_DEVICE_TO_DMA)) {
-			vTaskDelay(pdMS_TO_TICKS(1));
-		}
-
-		Xil_DCacheInvalidateRange((UINTPTR) RxBuffer, BUFFER_SIZE);
-
-		xil_printf("DMA Transfer Completed\r\n");
-
-		// Process the received data (for demonstration, just print the first 10 samples)
-		xil_printf("First 1000 samples received:\r\n");
-		for (int i = 0; i < SAMPLES; i++) {
-			xil_printf("%d, ", (short) RxBuffer[i]);
-		}
-
-		xil_printf("\r\n--- Test Completed ---\r\n");
-
-		vTaskDelay(pdMS_TO_TICKS(20000)); // Delay before next transfer
+	Status = init_dma_in();
+	if (Status != XST_SUCCESS) {
+		xil_printf("DMA IN Initialization Failed\r\n");
+		vTaskDelete(NULL);
 	}
 
-	vTaskDelete(NULL);
+	// FIJAMOS EL TAMAÑO: 48000 muestras de 16 bits = 96000 bytes
+	const int FIXED_SAMPLES = 4096;
+	const int BYTES_TO_TRANSFER = FIXED_SAMPLES * 4;
+	//const int BYTES_TO_TRANSFER = FIXED_SAMPLES; //* sizeof(u16);
+
+	xil_printf("Iniciando test de tamano fijo: %d bytes\r\n", SAMPLES);
+
+	while (1) { // Bucle infinito para probar la estabilidad
+
+
+		// 1. Limpiar caché: Aseguramos que la RAM esté lista para recibir
+		Xil_DCacheFlushRange((UINTPTR) RxBuffer, BYTES_TO_TRANSFER);
+
+		uint64_t t_i_start = get_hw_time();
+
+//		XAxiDma_Reset(&AxiDmaOut);
+//		while(!XAxiDma_ResetIsDone(&AxiDmaOut));
+
+		// 2. Iniciar transferencia
+		Status = XAxiDma_SimpleTransfer(&AxiDmaOut, (UINTPTR) RxBuffer,
+				BYTES_TO_TRANSFER, XAXIDMA_DEVICE_TO_DMA);
+
+		if (Status != XST_SUCCESS) {
+			xil_printf("Error al iniciar: %d\r\n", Status);
+			vTaskDelay(pdMS_TO_TICKS(1000));
+			continue;
+		}
+
+		// 3. Espera activa (Si se queda aquí, la PL NO está mandando TLAST)
+		// Agregamos un pequeño timeout de seguridad para que no muera el procesador
+		int timeout = 0;
+		while (XAxiDma_Busy(&AxiDmaOut, XAXIDMA_DEVICE_TO_DMA)) {
+			timeout++;
+			if (timeout > 10000000) { // Timeout arbitrario
+				xil_printf(
+						"TIMEOUT: El DMA sigue ocupado. La PL envio TLAST?\r\n");
+				break;
+			}
+		}
+
+		// 4. Invalidar caché: Obligamos al CPU a leer de la RAM, no de su caché
+		Xil_DCacheInvalidateRange((UINTPTR) RxBuffer, BYTES_TO_TRANSFER);
+
+		uint64_t t_i_end = get_hw_time() - t_i_start;
+		float time = (float) (t_i_end * 1000000.0 / freq);
+
+//        for (int i = 0; i < 1000; i++){
+//        	xil_printf("%d,", (short)RxBuffer[i]);
+//        }
+
+		// 1. Limpiar todo el buffer
+		// Limpiamos el buffer
+		memset(RxBuffer, 0, BYTES_TO_TRANSFER);
+
+		// El monitor espera el valor 123 en el ciclo 100 del bus.
+		// Como el bus es de 32 bits y el buffer de 16:
+		// Ciclo 100 del bus = Muestra 201 (parte alta) y Muestra 200 (parte baja).
+		if (cont % 3 == 0) {
+			RxBuffer[100] = 112; // Ahora sí, posición 100 es ciclo 100
+		} else if (cont % 3 == 1) {
+			RxBuffer[100] = 123; // Ahora sí, posición 100 es ciclo 100
+		} else {
+			RxBuffer[100] = 0; // Ahora sí, posición 100 es ciclo 100
+		}
+
+		// ¡ESTO ES LO QUE FALTA!
+		Xil_DCacheFlushRange((UINTPTR) RxBuffer, BYTES_TO_TRANSFER);
+
+		t_i_start = get_hw_time();
+		Status = XAxiDma_SimpleTransfer(&AxiDmaIn, (UINTPTR) RxBuffer,
+				BYTES_TO_TRANSFER, XAXIDMA_DMA_TO_DEVICE);
+
+		if (Status != XST_SUCCESS) {
+			xil_printf("Error al iniciar: %d\r\n", Status);
+			vTaskDelay(pdMS_TO_TICKS(1000));
+			continue;
+		}
+
+		// 3. Espera activa (Si se queda aquí, la PL NO está mandando TLAST)
+		// Agregamos un pequeño timeout de seguridad para que no muera el procesador
+		timeout = 0;
+		while (XAxiDma_Busy(&AxiDmaIn, XAXIDMA_DMA_TO_DEVICE)) {
+			timeout++;
+			if (timeout > 10000000) { // Timeout arbitrario
+				xil_printf(
+						"TIMEOUT: El DMA sigue ocupado. La PL envio TLAST?\r\n");
+				break;
+			}
+		}
+
+		// 4. Invalidar caché: Obligamos al CPU a leer de la RAM, no de su caché
+		Xil_DCacheInvalidateRange((UINTPTR) RxBuffer, BYTES_TO_TRANSFER);
+
+		t_i_end = get_hw_time() - t_i_start;
+		float time_in = (float) (t_i_end * 1000000.0 / freq);
+
+		xil_printf(
+				"Transfer OK. Read time (PL2PS): %d us, \tWrite time (PS2PL): %d us\r\n",
+				(int) time, (int) time_in);
+
+		cont++;
+
+		vTaskDelay(pdMS_TO_TICKS(1000)); // Esperar 1 seg entre pruebas
+	}
 }
 
-int init_dma() {
+int init_dma_out() {
 	XAxiDma_Config *CfgPtr;
 	int Status;
 
-	CfgPtr = XAxiDma_LookupConfig(DMA_DEV_ID);
+	CfgPtr = XAxiDma_LookupConfig(DMA_OUT_DEV_ID);
 	if (!CfgPtr) {
-		xil_printf("No config found for %d\r\n", DMA_DEV_ID);
+		xil_printf("No config found for %d\r\n", DMA_OUT_DEV_ID);
 		return XST_FAILURE;
 	}
 
-	Status = XAxiDma_CfgInitialize(&AxiDma, CfgPtr);
+	Status = XAxiDma_CfgInitialize(&AxiDmaOut, CfgPtr);
 	if (Status != XST_SUCCESS) {
 		xil_printf("Initialization failed %d\r\n", Status);
 		return XST_FAILURE;
 	}
 
-	if (AxiDma.HasS2Mm) {
+	// Leemos el registro de estado específico de S2MM (Entrada)
+	// Usamos el offset 0x34 directamente para no fallar
+	u32 s2mm_status = XAxiDma_ReadReg(CfgPtr->BaseAddr, 0x34);
+	xil_printf("S2MM Status Register (Entrada): 0x%08X\r\n", s2mm_status);
+
+	if (AxiDmaOut.HasS2Mm) {
 		xil_printf("Canal S2MM detectado y listo.\r\n");
 	} else {
 		xil_printf("Error: El hardware DMA no tiene el canal S2MM activo.\r\n");
+		return XST_FAILURE;
+	}
+
+	return XST_SUCCESS;
+}
+
+int init_dma_in() {
+	XAxiDma_Config *CfgPtr;
+	int Status;
+
+	CfgPtr = XAxiDma_LookupConfig(DMA_IN_DEV_ID);
+	if (!CfgPtr) {
+		xil_printf("No config found for %d\r\n", DMA_IN_DEV_ID);
+		return XST_FAILURE;
+	}
+
+	Status = XAxiDma_CfgInitialize(&AxiDmaIn, CfgPtr);
+	if (Status != XST_SUCCESS) {
+		xil_printf("Initialization failed %d\r\n", Status);
+		return XST_FAILURE;
+	}
+
+	if (AxiDmaIn.HasMm2S) {
+		xil_printf("Canal MM2S detectado y listo.\r\n");
+	} else {
+		xil_printf("Error: El hardware DMA no tiene el canal MM2S activo.\r\n");
 		return XST_FAILURE;
 	}
 

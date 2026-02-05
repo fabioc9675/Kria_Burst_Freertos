@@ -11,6 +11,7 @@ RemoteSystemsTempFiles/
 *.o
 *.d
 *.a
+!libfftw3f.a
 *.jou
 *.log
 *.backup.jou
