@@ -558,3 +558,34 @@ timestamp=[2026-02-05 01:11:47], mode=BUILD, duration=0:00:00.771, duration_ms=7
 timestamp=[2026-02-05 01:14:41], mode=BUILD, duration=0:00:00.773, duration_ms=773, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
 timestamp=[2026-02-05 01:16:03], mode=BUILD, duration=0:00:00.776, duration_ms=776, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
 timestamp=[2026-02-05 01:20:09], mode=BUILD, duration=0:00:00.752, duration_ms=752, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:17:14], mode=BUILD, duration=0:00:00.835, duration_ms=835, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:26:31], mode=BUILD, duration=0:00:00.768, duration_ms=768, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:27:12], mode=BUILD, duration=0:00:00.748, duration_ms=748, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:27:34], mode=BUILD, duration=0:00:00.765, duration_ms=765, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:28:24], mode=BUILD, duration=0:00:00.784, duration_ms=784, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:28:50], mode=BUILD, duration=0:00:00.836, duration_ms=836, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:28:56], mode=BUILD, duration=0:00:00.105, duration_ms=105, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:30:57], mode=BUILD, duration=0:00:00.776, duration_ms=776, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:31:34], mode=BUILD, duration=0:00:00.758, duration_ms=758, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:33:14], mode=BUILD, duration=0:00:00.817, duration_ms=817, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:33:14], mode=BUILD, duration=0:00:00.164, duration_ms=164, data={name=memory_contention_system, configuration=Emulation-SW, clean_build=false}
+timestamp=[2026-02-05 10:34:52], mode=BUILD, duration=0:00:00.748, duration_ms=748, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:36:42], mode=BUILD, duration=0:00:00.749, duration_ms=749, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:40:22], mode=BUILD, duration=0:00:00.731, duration_ms=731, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:41:14], mode=BUILD, duration=0:00:00.734, duration_ms=734, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:42:18], mode=BUILD, duration=0:00:00.109, duration_ms=109, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:55:30], mode=PLATFORM_GENERATION, duration=0:00:43.261, duration_ms=43261, data={name=Kria_platform}
+timestamp=[2026-02-05 10:55:45], mode=BUILD, duration=0:00:00.844, duration_ms=844, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 10:55:46], mode=BUILD, duration=0:00:00.113, duration_ms=113, data={name=memory_contention_system, configuration=Emulation-SW, clean_build=false}
+timestamp=[2026-02-05 10:57:41], mode=BUILD, duration=0:00:00.825, duration_ms=825, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 11:34:22], mode=PLATFORM_GENERATION, duration=0:00:38.761, duration_ms=38761, data={name=Kria_platform}
+timestamp=[2026-02-05 11:34:36], mode=BUILD, duration=0:00:00.861, duration_ms=861, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 11:34:37], mode=BUILD, duration=0:00:00.119, duration_ms=119, data={name=memory_contention_system, configuration=Emulation-SW, clean_build=false}
+timestamp=[2026-02-05 11:42:51], mode=BUILD, duration=0:00:00.120, duration_ms=120, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 11:50:34], mode=BUILD, duration=0:00:00.789, duration_ms=789, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 11:51:53], mode=BUILD, duration=0:00:03.352, duration_ms=3352, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 12:01:10], mode=BUILD, duration=0:00:01.334, duration_ms=1334, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 12:25:06], mode=BUILD, duration=0:00:00.844, duration_ms=844, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 12:25:40], mode=BUILD, duration=0:00:00.818, duration_ms=818, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 12:27:33], mode=BUILD, duration=0:00:00.116, duration_ms=116, data={name=core_0_cont_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-05 12:32:10], mode=BUILD, duration=0:00:00.787, duration_ms=787, data={name=core_0_cont_app, configuration=Debug, clean_build=false}

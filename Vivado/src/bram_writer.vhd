@@ -36,7 +36,7 @@ if reset = '0' then
 elsif rising_edge(clk) then
             
    contador <= (contador + 1) mod MAX_SAMPLES;
-   address_int <= std_logic_vector(to_unsigned(contador, ADDR_SIZE));
+   address_int <= std_logic_vector(to_unsigned(contador * 4, ADDR_SIZE));
    dout <= std_logic_vector(to_unsigned(contador, 32));
 end if;
 end process;   

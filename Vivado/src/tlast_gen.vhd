@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity axis_packet_controller is
     Generic (
-        MAX_SAMPLES : integer := 4096
+        MAX_SAMPLES : integer := 8192
     );
     Port (
         clk             : in  STD_LOGIC;

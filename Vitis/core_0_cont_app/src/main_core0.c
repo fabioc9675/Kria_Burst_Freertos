@@ -12,23 +12,27 @@
 
 // --- DMA de salida desde el PL, entrada al PS ---
 #define DMA_OUT_DEV_ID XPAR_AXI_DMA_OUT_DEVICE_ID
+#define DMA_IN_DEV_ID XPAR_AXI_DMA_IN_DEVICE_ID
 #define DMA_OUT_IRQ_ID XPAR_FABRIC_AXI_DMA_OUT_S2MM_INTROUT_INTR
 #define BRAM_IDA_ADDR      0x84000000
-#define SAMPLES 4096
+#define BRAM_OUT_ADDR      0x82000000
+#define SAMPLES 8192
 #define BUFFER_SIZE (SAMPLES * 2)
 
 // --- CONFIGURACION ---
 #define CORE_ID 0
 #define PL_IRQ_ID 123U
 #define INTC_DEVICE_ID XPAR_SCUGIC_SINGLE_DEVICE_ID
-#define TEST_COUNT 5 // Mediremos el tiempo que toman 10 IRQs
-#define TEST_DATA  100
+#define TEST_COUNT 10 // Mediremos el tiempo que toman 10 IRQs
+#define TEST_DATA  110
 
 #define TICK_10MS 1000000 // A 100MHz
 
 // Buffer alineado para optimizar el uso de NEON con memcpy
 u32 local_data_dma[SAMPLES] __attribute__((aligned(64)));
 u32 local_data_ram[SAMPLES] __attribute__((aligned(64)));
+
+volatile uint32_t *bram_ptr = (volatile uint32_t *) BRAM_OUT_ADDR;
 
 // Usamos la instancia que FreeRTOS ya crea internamente
 extern XScuGic xInterruptController;
@@ -40,6 +44,7 @@ volatile uint64_t t_isr_timestamp;
 // Variables de la DMA
 // u32 RxBuffer[SAMPLES] __attribute__((aligned(64))); // Cambiar a u32
 XAxiDma AxiDmaOut; // Instance of the DMA engine
+XAxiDma AxiDmaIn;
 
 typedef struct {
 	uint64_t t_read_ram;
@@ -62,6 +67,7 @@ static inline uint32_t get_hw_freq(void) {
 
 // Prototipo de funciones
 int init_dma_out();
+int init_dma_in();
 int SetupInterruptSystem(XScuGic *GicInstPtr);
 
 void vReadMemTask(void *pvParameters);
@@ -114,16 +120,23 @@ void vTaskMaster(void *pvParameters) {
 
 void vReadMemTask(void *pvParameters) {
 
-	uint64_t t_last_irq = 0;
-	uint64_t t_current_irq = 0;
-	uint32_t freq = get_hw_freq();
+	// uint64_t t_last_irq = 0;
+	//uint64_t t_current_irq = 0;
+	// uint32_t freq = get_hw_freq();
 	int Status;
+	int cont = 0;
 
 	TBenchmarkData log_entry;
 
 	Status = init_dma_out();
 	if (Status != XST_SUCCESS) {
 		xil_printf("DMA OUT Initialization Failed\r\n");
+		vTaskDelete(NULL);
+	}
+
+	Status = init_dma_in();
+	if (Status != XST_SUCCESS) {
+		// xil_printf("DMA OUT Initialization Failed\r\n");
 		vTaskDelete(NULL);
 	}
 
@@ -141,20 +154,29 @@ void vReadMemTask(void *pvParameters) {
 		//--------------------------------------------------
 		// Lectura del DMA
 		//--------------------------------------------------
-		Xil_DCacheFlushRange(local_data_dma, BYTES_TO_TRANSFER);
+		Xil_DCacheFlushRange((INTPTR) local_data_dma, BYTES_TO_TRANSFER);
 
 		uint64_t t_start_read_dma = get_hw_time();
 
-		Status = XAxiDma_SimpleTransfer(&AxiDmaOut, (UINTPTR)local_data_dma,
-		                                BYTES_TO_TRANSFER, XAXIDMA_DEVICE_TO_DMA);
+		Status = XAxiDma_SimpleTransfer(&AxiDmaOut, (UINTPTR) local_data_dma,
+				BYTES_TO_TRANSFER, XAXIDMA_DEVICE_TO_DMA);
 
 		// ¡ESTO ES VITAL! Esperar a que el hardware termine de saturar el bus
 		while (XAxiDma_Busy(&AxiDmaOut, XAXIDMA_DEVICE_TO_DMA)) {
-		    asm volatile("yield");
+			asm volatile("yield");
 		}
 
 		uint64_t t_end_read_dma = get_hw_time();
-		log_entry.t_read_dma = (uint16_t)(t_end_read_dma - t_start_read_dma);
+		log_entry.t_read_dma = (uint16_t) (t_end_read_dma - t_start_read_dma);
+
+		// 5. Modificacion de datos (Inyectar el valor 123 para el monitor)
+		if (cont % 3 == 1) {
+			local_data_dma[100] = 123;
+		}
+		Xil_DCacheFlushRange((INTPTR) local_data_dma, BYTES_TO_TRANSFER);
+
+		Status = XAxiDma_SimpleTransfer(&AxiDmaIn, (UINTPTR) local_data_dma,
+				BYTES_TO_TRANSFER, XAXIDMA_DMA_TO_DEVICE);
 
 		xil_printf("\r\nDMA Transfer Complete. Data:\r\n");
 		for (int i = 0; i < TEST_DATA; i++) {
@@ -163,11 +185,20 @@ void vReadMemTask(void *pvParameters) {
 
 		// 3. Copia masiva BRAM -> RAM (Muy rapido con memcpy)
 		uint64_t t_i_start_ram = get_hw_time();
-		Xil_DCacheInvalidateRange((void*) BRAM_IDA_ADDR, SAMPLES * sizeof(u32));
+		Xil_DCacheInvalidateRange((INTPTR) BRAM_IDA_ADDR,
+		SAMPLES * sizeof(u32));
 		memcpy(local_data_ram, (void*) BRAM_IDA_ADDR, SAMPLES * sizeof(u32));
 		uint64_t t_i_end_ram = get_hw_time();
 
 		log_entry.t_read_ram = t_i_end_ram - t_i_start_ram;
+
+		// 5. Modificacion de datos (Inyectar el valor 123 para el monitor)
+		if (cont % 3 == 1) {
+		local_data_ram[25] = 123;
+		}
+		Xil_DCacheFlushRange((INTPTR)local_data_ram, SAMPLES * sizeof(u32));
+		memcpy((void*) BRAM_OUT_ADDR, local_data_ram, SAMPLES * sizeof(u32));
+		Xil_DCacheFlushRange((INTPTR)BRAM_OUT_ADDR, SAMPLES * sizeof(u32));
 
 		xil_printf("\r\nRAM Transfer Complete. Data:\r\n");
 		for (int i = 0; i < TEST_DATA; i++) {
@@ -175,6 +206,8 @@ void vReadMemTask(void *pvParameters) {
 		}
 
 		xQueueSend(xLogQueue, &log_entry, 0);
+
+		cont++;
 
 		// vTaskDelay(pdMS_TO_TICKS(2));
 	}
@@ -286,6 +319,32 @@ int init_dma_out() {
 		xil_printf("Canal S2MM detectado y listo.\r\n");
 	} else {
 		xil_printf("Error: El hardware DMA no tiene el canal S2MM activo.\r\n");
+		return XST_FAILURE;
+	}
+
+	return XST_SUCCESS;
+}
+
+int init_dma_in() {
+	XAxiDma_Config *CfgPtr;
+	int Status;
+
+	CfgPtr = XAxiDma_LookupConfig(DMA_IN_DEV_ID);
+	if (!CfgPtr) {
+//		xil_printf("No config found for %d\r\n", DMA_IN_DEV_ID);
+		return XST_FAILURE;
+	}
+
+	Status = XAxiDma_CfgInitialize(&AxiDmaIn, CfgPtr);
+	if (Status != XST_SUCCESS) {
+//		xil_printf("Initialization failed %d\r\n", Status);
+		return XST_FAILURE;
+	}
+
+	if (AxiDmaIn.HasMm2S) {
+//		xil_printf("Canal MM2S detectado y listo.\r\n");
+	} else {
+//		xil_printf("Error: El hardware DMA no tiene el canal MM2S activo.\r\n");
 		return XST_FAILURE;
 	}
 
