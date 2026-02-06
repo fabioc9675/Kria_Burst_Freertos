@@ -7,7 +7,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity bram_writer is
     generic (
            MAX_SAMPLES : integer := 8192;
-           ADDR_SIZE : integer := 14
+           ADDR_SIZE : integer := 15
     );
     Port ( clk : in STD_LOGIC;
            reset :  in std_logic;

@@ -28,6 +28,7 @@ begin
     bram_en <= '1'; -- Siempre habilitada para lectura continua
     bram_we <= '0'; -- Modo lectura
 
+
     process(clk, reset)
     begin
         if reset = '0' then

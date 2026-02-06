@@ -3,22 +3,26 @@
   <configuration name="Emulation-SW" id="com.xilinx.sdx.system.managedbuilder.swemu.configuration.1032718610">
     <configBuildOptions xsi:type="systemproject:SystemOptions">
       <applications name="core_0_cont_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
+      <applications name="core_1_mem_app" domainName="psu_cortexa53_1" domainPrettyName="psu_cortexa53_1" appBuildConfig="Debug"/>
       <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
     </configBuildOptions>
     <lastBuildOptions xsi:type="systemproject:SystemOptions">
       <applications name="core_0_cont_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
+      <applications name="core_1_mem_app" domainName="psu_cortexa53_1" domainPrettyName="psu_cortexa53_1" appBuildConfig="Debug"/>
       <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
     </lastBuildOptions>
   </configuration>
   <configuration name="Emulation-HW" id="com.xilinx.sdx.system.managedbuilder.hwemu.configuration.1115240633">
     <configBuildOptions xsi:type="systemproject:SystemOptions" target="hw_emu">
       <applications name="core_0_cont_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
+      <applications name="core_1_mem_app" domainName="psu_cortexa53_1" domainPrettyName="psu_cortexa53_1" appBuildConfig="Debug"/>
       <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
     </configBuildOptions>
   </configuration>
   <configuration name="Hardware" id="com.xilinx.sdx.system.managedbuilder.hw.configuration.633437086">
     <configBuildOptions xsi:type="systemproject:SystemOptions" target="hw">
       <applications name="core_0_cont_app" domainName="freertos10_xilinx_domain" domainPrettyName="freertos10_xilinx on psu_cortexa53_0" appBuildConfig="Debug"/>
+      <applications name="core_1_mem_app" domainName="psu_cortexa53_1" domainPrettyName="psu_cortexa53_1" appBuildConfig="Debug"/>
       <options xsi:type="sdsproject:Option" gensdcard="true" dmclkid="2"/>
     </configBuildOptions>
   </configuration>

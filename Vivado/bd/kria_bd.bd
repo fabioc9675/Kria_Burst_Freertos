@@ -41,8 +41,8 @@
       "axi_bram_ctrl_out": "",
       "blk_mem_gen_in": "",
       "bram_reader_0": "",
-      "axis_packet_controll_0": "",
-      "bram_writer_0": ""
+      "bram_writer_0": "",
+      "axis_packet_controll_0": ""
     },
     "ports": {
       "fan_en_b": {
@@ -2348,8 +2348,8 @@
       },
       "axi_dma_out": {
         "vlnv": "xilinx.com:ip:axi_dma:7.1",
-        "xci_name": "kria_bd_axi_dma_0",
-        "xci_path": "ip\\kria_bd_axi_dma_0\\kria_bd_axi_dma_0.xci",
+        "xci_name": "kria_bd_axi_dma_out_0",
+        "xci_path": "ip\\kria_bd_axi_dma_out_0\\kria_bd_axi_dma_out_0.xci",
         "inst_hier_path": "axi_dma_out",
         "parameters": {
           "c_include_mm2s": {
@@ -2365,7 +2365,7 @@
             "value": "256"
           },
           "c_sg_length_width": {
-            "value": "16"
+            "value": "22"
           }
         },
         "interface_ports": {
@@ -2492,8 +2492,8 @@
       },
       "axi_dma_in": {
         "vlnv": "xilinx.com:ip:axi_dma:7.1",
-        "xci_name": "kria_bd_axi_dma_0_0",
-        "xci_path": "ip\\kria_bd_axi_dma_0_0\\kria_bd_axi_dma_0_0.xci",
+        "xci_name": "kria_bd_axi_dma_in_0",
+        "xci_path": "ip\\kria_bd_axi_dma_in_0\\kria_bd_axi_dma_in_0.xci",
         "inst_hier_path": "axi_dma_in",
         "parameters": {
           "c_include_mm2s": {
@@ -2509,7 +2509,7 @@
             "value": "256"
           },
           "c_sg_length_width": {
-            "value": "16"
+            "value": "22"
           }
         },
         "interface_ports": {
@@ -2721,8 +2721,8 @@
       },
       "axi_bram_ctrl_in": {
         "vlnv": "xilinx.com:ip:axi_bram_ctrl:4.1",
-        "xci_name": "kria_bd_axi_bram_ctrl_0_0",
-        "xci_path": "ip\\kria_bd_axi_bram_ctrl_0_0\\kria_bd_axi_bram_ctrl_0_0.xci",
+        "xci_name": "kria_bd_axi_bram_ctrl_in_0",
+        "xci_path": "ip\\kria_bd_axi_bram_ctrl_in_0\\kria_bd_axi_bram_ctrl_in_0.xci",
         "inst_hier_path": "axi_bram_ctrl_in",
         "parameters": {
           "SINGLE_PORT_BRAM": {
@@ -2732,8 +2732,8 @@
       },
       "blk_mem_gen_out": {
         "vlnv": "xilinx.com:ip:blk_mem_gen:8.4",
-        "xci_name": "kria_bd_blk_mem_gen_in_0",
-        "xci_path": "ip\\kria_bd_blk_mem_gen_in_0\\kria_bd_blk_mem_gen_in_0.xci",
+        "xci_name": "kria_bd_blk_mem_gen_out_0",
+        "xci_path": "ip\\kria_bd_blk_mem_gen_out_0\\kria_bd_blk_mem_gen_out_0.xci",
         "inst_hier_path": "blk_mem_gen_out",
         "parameters": {
           "Assume_Synchronous_Clk": {
@@ -2761,8 +2761,8 @@
       },
       "axi_bram_ctrl_out": {
         "vlnv": "xilinx.com:ip:axi_bram_ctrl:4.1",
-        "xci_name": "kria_bd_axi_bram_ctrl_in_0",
-        "xci_path": "ip\\kria_bd_axi_bram_ctrl_in_0\\kria_bd_axi_bram_ctrl_in_0.xci",
+        "xci_name": "kria_bd_axi_bram_ctrl_out_0",
+        "xci_path": "ip\\kria_bd_axi_bram_ctrl_out_0\\kria_bd_axi_bram_ctrl_out_0.xci",
         "inst_hier_path": "axi_bram_ctrl_out",
         "parameters": {
           "SINGLE_PORT_BRAM": {
@@ -2772,8 +2772,8 @@
       },
       "blk_mem_gen_in": {
         "vlnv": "xilinx.com:ip:blk_mem_gen:8.4",
-        "xci_name": "kria_bd_blk_mem_gen_out_0",
-        "xci_path": "ip\\kria_bd_blk_mem_gen_out_0\\kria_bd_blk_mem_gen_out_0.xci",
+        "xci_name": "kria_bd_blk_mem_gen_in_0",
+        "xci_path": "ip\\kria_bd_blk_mem_gen_in_0\\kria_bd_blk_mem_gen_in_0.xci",
         "inst_hier_path": "blk_mem_gen_in",
         "parameters": {
           "Assume_Synchronous_Clk": {
@@ -2855,6 +2855,63 @@
             "direction": "O"
           },
           "valid_led": {
+            "direction": "O"
+          }
+        }
+      },
+      "bram_writer_0": {
+        "vlnv": "xilinx.com:module_ref:bram_writer:1.0",
+        "xci_name": "kria_bd_bram_writer_0_0",
+        "xci_path": "ip\\kria_bd_bram_writer_0_0\\kria_bd_bram_writer_0_0.xci",
+        "inst_hier_path": "bram_writer_0",
+        "reference_info": {
+          "ref_type": "hdl",
+          "ref_name": "bram_writer",
+          "boundary_crc": "0x0"
+        },
+        "ports": {
+          "clk": {
+            "type": "clk",
+            "direction": "I",
+            "parameters": {
+              "ASSOCIATED_RESET": {
+                "value": "reset",
+                "value_src": "constant"
+              },
+              "FREQ_HZ": {
+                "value": "99999992",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "kria_bd_zynq_ultra_ps_e_0_0_pl_clk0",
+                "value_src": "default_prop"
+              }
+            }
+          },
+          "reset": {
+            "type": "rst",
+            "direction": "I",
+            "parameters": {
+              "POLARITY": {
+                "value": "ACTIVE_LOW",
+                "value_src": "const_prop"
+              }
+            }
+          },
+          "enb": {
+            "direction": "O"
+          },
+          "address": {
+            "direction": "O",
+            "left": "14",
+            "right": "0"
+          },
+          "dout": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "weo": {
             "direction": "O"
           }
         }
@@ -3061,63 +3118,6 @@
                 "value_src": "constant"
               }
             }
-          }
-        }
-      },
-      "bram_writer_0": {
-        "vlnv": "xilinx.com:module_ref:bram_writer:1.0",
-        "xci_name": "kria_bd_bram_writer_0_0",
-        "xci_path": "ip\\kria_bd_bram_writer_0_0\\kria_bd_bram_writer_0_0.xci",
-        "inst_hier_path": "bram_writer_0",
-        "reference_info": {
-          "ref_type": "hdl",
-          "ref_name": "bram_writer",
-          "boundary_crc": "0x0"
-        },
-        "ports": {
-          "clk": {
-            "type": "clk",
-            "direction": "I",
-            "parameters": {
-              "ASSOCIATED_RESET": {
-                "value": "reset",
-                "value_src": "constant"
-              },
-              "FREQ_HZ": {
-                "value": "99999992",
-                "value_src": "user_prop"
-              },
-              "CLK_DOMAIN": {
-                "value": "kria_bd_zynq_ultra_ps_e_0_0_pl_clk0",
-                "value_src": "default_prop"
-              }
-            }
-          },
-          "reset": {
-            "type": "rst",
-            "direction": "I",
-            "parameters": {
-              "POLARITY": {
-                "value": "ACTIVE_LOW",
-                "value_src": "const_prop"
-              }
-            }
-          },
-          "enb": {
-            "direction": "O"
-          },
-          "address": {
-            "direction": "O",
-            "left": "13",
-            "right": "0"
-          },
-          "dout": {
-            "direction": "O",
-            "left": "31",
-            "right": "0"
-          },
-          "weo": {
-            "direction": "O"
           }
         }
       }
@@ -3373,8 +3373,8 @@
           "blk_mem_gen_in/clkb",
           "ps8_0_axi_periph/M03_ACLK",
           "bram_reader_0/clk",
-          "axis_packet_controll_0/clk",
-          "bram_writer_0/clk"
+          "bram_writer_0/clk",
+          "axis_packet_controll_0/clk"
         ]
       },
       "counter_out": {
@@ -3415,8 +3415,8 @@
           "axi_bram_ctrl_in/s_axi_aresetn",
           "ps8_0_axi_periph/M03_ARESETN",
           "bram_reader_0/reset",
-          "axis_packet_controll_0/resetn",
-          "bram_writer_0/reset"
+          "bram_writer_0/reset",
+          "axis_packet_controll_0/resetn"
         ]
       },
       "pulse_irq_0_irq_out": {
