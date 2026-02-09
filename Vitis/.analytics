@@ -766,3 +766,38 @@ timestamp=[2026-02-07 23:37:30], mode=BUILD, duration=0:00:00.104, duration_ms=1
 timestamp=[2026-02-07 23:37:31], mode=BUILD, duration=0:00:00.119, duration_ms=119, data={name=Core2_int_app, configuration=Debug, clean_build=false}
 timestamp=[2026-02-07 23:37:31], mode=BUILD, duration=0:00:00.105, duration_ms=105, data={name=Core1_int_app, configuration=Debug, clean_build=false}
 timestamp=[2026-02-07 23:37:32], mode=BUILD, duration=0:00:00.114, duration_ms=114, data={name=Multicore_int_app_system, configuration=Emulation-SW, clean_build=false}
+timestamp=[2026-02-09 13:40:26], mode=WORKBENCH_START, duration=0:00:14.536, duration_ms=14536, data={}
+timestamp=[2026-02-09 13:40:28], mode=WORKBENCH_UI_INIT, duration=0:00:02.078, duration_ms=2078, data={editors_count=10, platform_editors_count=1, projects_count=8, platform_projects_count=1, active_platform_editor=false, projects=Core_0_receiver_app,Core_0_receiver_app_system,Core_1_fft_app,Core_3_transmiter_app,Kria_platform,RemoteSystemsTempFiles,dma_app,dma_app_system}
+timestamp=[2026-02-09 13:40:31], mode=PLATFORM_REPOSITORY_INIT, duration=0:00:01.701, duration_ms=1701, data={}
+timestamp=[2026-02-09 13:52:53], mode=APP_CREATION, duration=0:00:04.967, duration_ms=4967, data={name=fast_interrupt_app, project_type=sdk, os=freertos10_xilinx, processor=cortex-a53, runtime=C/C++, platform=Kria_platform, application_type=application}
+timestamp=[2026-02-09 14:09:52], mode=PLATFORM_GENERATION, duration=0:03:22.284, duration_ms=202284, data={name=Kria_platform}
+timestamp=[2026-02-09 14:10:24], mode=BUILD, duration=0:00:02.076, duration_ms=2076, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:13:37], mode=BUILD, duration=0:00:01.309, duration_ms=1309, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:13:48], mode=BUILD, duration=0:00:01.296, duration_ms=1296, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:17:21], mode=BUILD, duration=0:00:00.529, duration_ms=529, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:17:36], mode=BUILD, duration=0:00:01.130, duration_ms=1130, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:18:56], mode=BUILD, duration=0:00:01.219, duration_ms=1219, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:20:11], mode=BUILD, duration=0:00:01.078, duration_ms=1078, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:21:57], mode=BUILD, duration=0:00:01.206, duration_ms=1206, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:22:03], mode=BUILD, duration=0:00:00.246, duration_ms=246, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:33:37], mode=BUILD, duration=0:00:04.216, duration_ms=4216, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:34:39], mode=BUILD, duration=0:00:01.572, duration_ms=1572, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:45:27], mode=BUILD, duration=0:00:01.178, duration_ms=1178, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:50:47], mode=BUILD, duration=0:00:01.140, duration_ms=1140, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:52:08], mode=BUILD, duration=0:00:01.205, duration_ms=1205, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:52:23], mode=BUILD, duration=0:00:00.229, duration_ms=229, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:53:37], mode=BUILD, duration=0:00:01.187, duration_ms=1187, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:56:06], mode=BUILD, duration=0:00:01.073, duration_ms=1073, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 14:58:41], mode=BUILD, duration=0:00:01.191, duration_ms=1191, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 15:02:32], mode=BUILD, duration=0:00:00.223, duration_ms=223, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 15:51:07], mode=BUILD, duration=0:00:01.087, duration_ms=1087, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 15:55:07], mode=BUILD, duration=0:00:01.076, duration_ms=1076, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 15:55:48], mode=BUILD, duration=0:00:01.054, duration_ms=1054, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 15:56:35], mode=BUILD, duration=0:00:01.073, duration_ms=1073, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 15:58:50], mode=BUILD, duration=0:00:01.066, duration_ms=1066, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 16:00:28], mode=BUILD, duration=0:00:01.078, duration_ms=1078, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 16:04:04], mode=BUILD, duration=0:00:01.060, duration_ms=1060, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 16:07:25], mode=BUILD, duration=0:00:01.122, duration_ms=1122, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 16:08:04], mode=BUILD, duration=0:00:01.067, duration_ms=1067, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 16:15:23], mode=BUILD, duration=0:00:01.078, duration_ms=1078, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}
+timestamp=[2026-02-09 16:20:03], mode=BUILD, duration=0:00:01.075, duration_ms=1075, data={name=fast_interrupt_app, configuration=Debug, clean_build=false}

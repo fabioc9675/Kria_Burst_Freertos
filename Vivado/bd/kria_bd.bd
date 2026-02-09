@@ -5,7 +5,7 @@
       "device": "xck26-sfvc784-2LV-c",
       "gen_directory": "kria_bd",
       "name": "kria_bd",
-      "pfm_name": "xilinx:kr260_som:kria_bd:1.6",
+      "pfm_name": "xilinx:kr260_som:kria_bd:1.7",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "None",
       "tool_version": "2022.2",
@@ -28,7 +28,6 @@
       "zynq_ultra_ps_e_0": "",
       "proc_sys_reset_0": "",
       "xlconstant_0": "",
-      "pulse_irq_0": "",
       "dds_compiler_0": "",
       "axi_dma_out": "",
       "axi_smc": "",
@@ -42,7 +41,8 @@
       "blk_mem_gen_in": "",
       "bram_reader_0": "",
       "bram_writer_0": "",
-      "axis_packet_controll_0": ""
+      "axis_packet_controll_0": "",
+      "pulse_irq_0": ""
     },
     "ports": {
       "fan_en_b": {
@@ -2239,51 +2239,6 @@
         "xci_path": "ip\\kria_bd_xlconstant_0_0\\kria_bd_xlconstant_0_0.xci",
         "inst_hier_path": "xlconstant_0"
       },
-      "pulse_irq_0": {
-        "vlnv": "xilinx.com:module_ref:pulse_irq:1.0",
-        "xci_name": "kria_bd_pulse_irq_0_0",
-        "xci_path": "ip\\kria_bd_pulse_irq_0_0\\kria_bd_pulse_irq_0_0.xci",
-        "inst_hier_path": "pulse_irq_0",
-        "reference_info": {
-          "ref_type": "hdl",
-          "ref_name": "pulse_irq",
-          "boundary_crc": "0x0"
-        },
-        "ports": {
-          "clk": {
-            "type": "clk",
-            "direction": "I",
-            "parameters": {
-              "FREQ_HZ": {
-                "value": "99999992",
-                "value_src": "user_prop"
-              },
-              "CLK_DOMAIN": {
-                "value": "kria_bd_zynq_ultra_ps_e_0_0_pl_clk0",
-                "value_src": "default_prop"
-              }
-            }
-          },
-          "reset_n": {
-            "type": "rst",
-            "direction": "I"
-          },
-          "irq_out": {
-            "direction": "O",
-            "left": "5",
-            "right": "0",
-            "parameters": {
-              "PortWidth": {
-                "value": "1",
-                "value_src": "default_prop"
-              }
-            }
-          },
-          "led_out": {
-            "direction": "O"
-          }
-        }
-      },
       "dds_compiler_0": {
         "vlnv": "xilinx.com:ip:dds_compiler:6.0",
         "xci_name": "kria_bd_dds_compiler_0_0",
@@ -3120,6 +3075,45 @@
             }
           }
         }
+      },
+      "pulse_irq_0": {
+        "vlnv": "xilinx.com:module_ref:pulse_irq:1.0",
+        "xci_name": "kria_bd_pulse_irq_0_0",
+        "xci_path": "ip\\kria_bd_pulse_irq_0_0\\kria_bd_pulse_irq_0_0.xci",
+        "inst_hier_path": "pulse_irq_0",
+        "reference_info": {
+          "ref_type": "hdl",
+          "ref_name": "pulse_irq",
+          "boundary_crc": "0x0"
+        },
+        "ports": {
+          "clk": {
+            "type": "clk",
+            "direction": "I",
+            "parameters": {
+              "FREQ_HZ": {
+                "value": "99999992",
+                "value_src": "user_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "kria_bd_zynq_ultra_ps_e_0_0_pl_clk0",
+                "value_src": "default_prop"
+              }
+            }
+          },
+          "reset_n": {
+            "type": "rst",
+            "direction": "I"
+          },
+          "irq_out": {
+            "direction": "O",
+            "left": "5",
+            "right": "0"
+          },
+          "led_out": {
+            "direction": "O"
+          }
+        }
       }
     },
     "interface_nets": {
@@ -3355,7 +3349,6 @@
           "ps8_0_axi_periph/S00_ACLK",
           "zynq_ultra_ps_e_0/maxihpm0_lpd_aclk",
           "proc_sys_reset_0/slowest_sync_clk",
-          "pulse_irq_0/clk",
           "dds_compiler_0/aclk",
           "zynq_ultra_ps_e_0/saxihpc0_fpd_aclk",
           "axi_dma_out/m_axi_s2mm_aclk",
@@ -3374,7 +3367,8 @@
           "ps8_0_axi_periph/M03_ACLK",
           "bram_reader_0/clk",
           "bram_writer_0/clk",
-          "axis_packet_controll_0/clk"
+          "axis_packet_controll_0/clk",
+          "pulse_irq_0/clk"
         ]
       },
       "counter_out": {
